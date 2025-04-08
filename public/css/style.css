@@ -5,18 +5,59 @@ body {
 }
 
 .navbar {
-  background: #1f1f1f;
-  color: #fff;
+  background: rgb(204, 195, 195);
+  color: black;
   display: flex;
   justify-content: space-between;
   padding: 15px 30px;
   align-items: center;
+  height: 32px;
+  font-weight: bold;
 }
 
 .navbar a {
-  color: #fff;
+  color: black;
   margin: 0 10px;
   text-decoration: none;
+  font-weight: bold;
+}
+ /*media query*/
+@media screen and (max-width: 500px) {
+  .navbar a {
+    float: none;
+    display: block;
+  }
+}
+/*logo container*/
+.logo{
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+}
+/*logo image*/
+.logo img{
+  width: 44px;
+  height: 41px;
+  border-radius: 50px;
+}
+/*logo name*/
+.logo span{
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* signup button */
+.signup{
+  background-color:#00b894 ;
+  padding: 8px 8px;
+  border-radius: 10px;
+  font-weight: bolder;
+}
+.signup:hover{
+  background-color: #19705e;
+  transition: all 0.3s ease-out;
 }
 
 .hero {

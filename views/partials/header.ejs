@@ -1,9 +1,12 @@
 <header>
   <nav class="navbar">
-    <div class="nav-left">Nodot Academy</div>
+    <div class="logo">
+      <img src="../images/logo.jpg" alt="error loading" />
+      <span>Nodot Acadamy</span>
+    </div>
 
     <div class="nav-center">
-      <a href="/">Home</a>
+      <a class="active" href="#"><i class="fa fa-fw fa-home"></i> Home</a>
       <a href="#about">About</a>
       <a href="#courses">Courses</a>
     </div>
@@ -32,6 +35,10 @@
         </div>
       </a>
       <% } else { %>
+      <a href="/login">Login</a>
+      <a href="/signup">Sign Up</a>
+      <% } %>
+
       <a href="/cart" class="icon-cart" title="Cart">
         <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
       </a>
