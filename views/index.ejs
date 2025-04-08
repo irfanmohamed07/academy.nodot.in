@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Nodot Academy</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <%- include('partials/header') -%>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Learn. Build. Grow.</h1>
+        <p>
+          Welcome to Nodot Academy — Empowering future innovators through
+          quality learning and real-world internships.
+        </p>
+        <a href="/courses" class="cta-button">Explore Courses</a>
+      </div>
+    </section>
+
+    <section class="highlights">
+      <div class="highlight">💸 Affordable</div>
+      <div class="highlight">🧠 Practical Learning</div>
+      <div class="highlight">📜 Certificate + Internship</div>
+    </section>
+
+    <section class="courses" id="courses">
+      <h2>Popular Courses</h2>
+      <div class="course-grid">
+        <% courses.forEach(course => { %>
+        <div class="course-card">
+          <img src="<%= course.image_url %>" alt="<%= course.name %>" />
+          <h3><%= course.name %></h3>
+          <p><%= course.description %></p>
+          <span>₹<%= course.price %></span>
+          <a href="/course/<%= course.id %>">
+            <button>More Details</button>
+          </a>
+        </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <%- include('partials/footer') -%>
+  </body>
+</html>

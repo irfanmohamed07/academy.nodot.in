@@ -1,0 +1,21 @@
+<%- include("partials/header") %>
+
+<section class="container">
+  <h1>My Learning</h1>
+
+  <% if (courses.length > 0) { %>
+  <div class="course-grid">
+    <% courses.forEach(course => { %>
+    <div class="course-card">
+      <h2><%= course.name %></h2>
+      <p><%= course.description %></p>
+      <a href="/learn/<%= course.id %>">View Course</a>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <p>You haven’t purchased any courses yet.</p>
+  <% } %>
+</section>
+
+<%- include("partials/footer") %>

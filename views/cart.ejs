@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Cart</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f6f8;
+        padding: 30px;
+        color: #333;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .cart-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .cart-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+      }
+
+      .cart-item img {
+        width: 100px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 20px;
+      }
+
+      .cart-details {
+        flex: 1;
+      }
+
+      .cart-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+
+      .btn-remove {
+        background-color: #ff4d4d;
+        color: white;
+      }
+
+      .btn-remove:hover {
+        background-color: #cc0000;
+      }
+
+      .btn-checkout {
+        background-color: #28a745;
+        color: white;
+        width: 100%;
+        margin-top: 30px;
+      }
+
+      .btn-checkout:hover {
+        background-color: #218838;
+      }
+
+      .empty-cart {
+        text-align: center;
+        font-size: 18px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cart-container">
+      <h1>🛒 Your Cart</h1>
+
+      <% if (cart.length === 0) { %>
+      <p class="empty-cart">No items in cart.</p>
+      <% } else { %> <% cart.forEach(course => { %>
+      <div class="cart-item">
+        <img src="<%= course.image %>" alt="Course Image" />
+        <div class="cart-details">
+          <strong><%= course.name %></strong><br />
+          ₹<%= course.price %>
+        </div>
+        <div class="cart-actions">
+          <form action="/remove-from-cart" method="POST">
+            <input type="hidden" name="id" value="<%= course.id %>" />
+            <button class="btn btn-remove" type="submit">Remove</button>
+          </form>
+        </div>
+      </div>
+      <% }) %>
+
+      <form action="/checkout" method="POST">
+        <button class="btn btn-checkout" type="submit">
+          Proceed to Checkout
+        </button>
+      </form>
+      <% } %>
+    </div>
+  </body>
+</html>
