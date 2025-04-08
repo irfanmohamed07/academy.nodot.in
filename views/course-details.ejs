@@ -11,7 +11,7 @@
       }
 
       .top-container {
-        height: 60vh;
+        height: 40vh;
         background: #000;
         display: flex;
         justify-content: center;
@@ -38,14 +38,17 @@
 
       .top-right {
         flex: 1;
-        margin-top: 20%;
+        margin-top: 30%;
       }
 
       .info-card {
+        max-height: 100%; /* fits within top-container */
+        width: 100%;
         background: white;
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        box-sizing: border-box;
       }
 
       .course-image {
@@ -137,8 +140,10 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
+    <%- include("partials/header") %>
     <!-- Top Container (60vh) -->
     <div class="top-container">
       <div class="top-left">
@@ -181,17 +186,7 @@
 
     <!-- Bottom Section -->
     <div class="bottom-section">
-      <div class="section">
-        <h2>What You’ll Learn</h2>
-        <ul class="learn-list">
-          <% if (course.what_you_learn) { %> <%
-          course.what_you_learn.split('|').forEach(item => { %>
-          <li><%= item.trim() %></li>
-          <% }) %> <% } else { %>
-          <li>No details provided yet.</li>
-          <% } %>
-        </ul>
-      </div>
+      <!--   -->
 
       <div class="section">
         <h2>Course Content</h2>
@@ -212,5 +207,7 @@
         </div>
       </div>
     </div>
+
+    <%- include("partials/footer") %>
   </body>
 </html>

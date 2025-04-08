@@ -5,117 +5,317 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Your Cart</title>
     <style>
-      body {
-        font-family: "Segoe UI", sans-serif;
-        background: #f4f6f8;
-        padding: 30px;
-        color: #333;
+      h2 {
+        font-size: 18px;
+        font-weight: 400;
+        margin-bottom: 24px;
       }
-
-      h1 {
+      .cart_page .container {
+        padding: 4% 8%;
+      }
+      .cart_page .container h1 {
         text-align: center;
-        margin-bottom: 30px;
+        font-size: 40px;
+        font-weight: 300;
+        margin-bottom: 40px;
+      }
+      .cart_page .content {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 100px;
+      }
+      .apply_code {
+        display: flex;
+        width: 100%;
+        margin-bottom: 60px;
+      }
+      .apply_code #code {
+        width: 65%;
+        padding: 14px 20px;
+        border: none;
+        background-color: #f1f1f1;
+        color: #868686;
+        font-size: 14px;
+      }
+      .apply_code #code:focus {
+        outline: none;
+      }
+      .apply_code #code::placeholder {
+        color: #565555;
+        font-size: 14px;
+      }
+      .apply_code button {
+        background-color: #000;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 12px 30px;
+        border: none;
+        cursor: pointer;
+        width: 34%;
+        text-transform: uppercase;
+      }
+      .summary_price {
+        background-color: #f1f1f1;
+        padding: 20px;
+        margin-bottom: 24px;
+      }
+      .summary_price div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+      }
+      .summary_price div:first-child {
+        position: relative;
+      }
+      .summary_price div:first-child::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: #ccc;
+      }
+      .summary_price div h4 {
+        font-size: 14px;
+        font-weight: 400;
+      }
+      .summary_price .Delivery {
+        color: #4c4c4c;
+      }
+      .summary_price div:last-child span,
+      .summary_price div:last-child h4 {
+        font-weight: 700;
+      }
+      .checkout {
+        width: 100%;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        height: 48px;
+        transition: 0.25s ease-in-out !important;
+        margin-bottom: 40px;
+        cursor: pointer;
       }
 
-      .cart-container {
-        max-width: 800px;
-        margin: 0 auto;
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
-      .cart-item {
+      .cart_product {
+        position: relative;
         display: flex;
         align-items: center;
         margin-bottom: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
+        background-color: #f1f1f1;
+        border-radius: 25px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
       }
 
-      .cart-item img {
-        width: 100px;
-        height: 80px;
+      .product-img {
+        width: 90px;
+        height: 90px;
+        border-radius: 15px;
         object-fit: cover;
-        border-radius: 8px;
         margin-right: 20px;
+        border: 1px solid #ddd;
       }
 
-      .cart-details {
-        flex: 1;
+      .cart_info {
+        flex-grow: 1;
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
       }
 
-      .cart-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .btn {
-        padding: 10px 14px;
+      .delete_btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: transparent;
         border: none;
-        border-radius: 6px;
         cursor: pointer;
-        font-weight: bold;
-        transition: 0.3s;
+        padding: 4px;
+        transition: transform 0.2s ease;
       }
 
-      .btn-remove {
-        background-color: #ff4d4d;
-        color: white;
+      .delete_btn i {
+        font-size: 22px;
+        color: #e74c3c;
       }
 
-      .btn-remove:hover {
-        background-color: #cc0000;
+      .delete_btn:hover {
+        transform: scale(1.1);
       }
 
-      .btn-checkout {
-        background-color: #28a745;
-        color: white;
-        width: 100%;
-        margin-top: 30px;
+      /* For tablets and smaller screens (max-width: 1024px) */
+      @media screen and (max-width: 1024px) {
+        .cart_page .content {
+          grid-template-columns: 1fr; /* Stack items in a single column */
+          gap: 50px; /* Reduce the gap */
+        }
+
+        .cart_page .container h1 {
+          font-size: 32px; /* Decrease heading size */
+        }
+
+        .apply_code {
+          flex-direction: column;
+        }
+
+        .apply_code #code {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+
+        .apply_code button {
+          width: 100%;
+        }
       }
 
-      .btn-checkout:hover {
-        background-color: #218838;
+      /* For mobile screens (max-width: 768px) */
+      @media screen and (max-width: 768px) {
+        h2 {
+          font-size: 16px; /* Reduce font size */
+        }
+
+        .cart_page .container {
+          padding: 5% 4%;
+        }
+
+        .cart_page .container h1 {
+          font-size: 28px;
+        }
+
+        .cart_page .content {
+          gap: 30px;
+        }
+
+        .product-img {
+          width: 60px;
+          height: 60px;
+          margin-right: 10px;
+        }
+
+        .cart_info {
+          font-size: 14px;
+        }
+
+        .quantity-btn {
+          font-size: 14px;
+          padding: 5px 10px;
+        }
+
+        .quantity {
+          margin: 0 5px;
+        }
+
+        .delete_btn {
+          font-size: 20px;
+        }
       }
 
-      .empty-cart {
-        text-align: center;
-        font-size: 18px;
-        color: #777;
+      /* For small mobile screens (max-width: 480px) */
+      @media screen and (max-width: 480px) {
+        .cart_page .container h1 {
+          font-size: 24px;
+        }
+
+        .summary_price div h4 {
+          font-size: 12px;
+        }
+
+        .checkout {
+          font-size: 14px;
+          height: 40px;
+        }
       }
     </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
-    <div class="cart-container">
-      <h1>🛒 Your Cart</h1>
+    <%- include("partials/header") %>
+    <div class="cart_page">
+      <div class="container">
+        <h1>🛒 Your Cart</h1>
 
-      <% if (cart.length === 0) { %>
-      <p class="empty-cart">No items in cart.</p>
-      <% } else { %> <% cart.forEach(course => { %>
-      <div class="cart-item">
-        <img src="<%= course.image %>" alt="Course Image" />
-        <div class="cart-details">
-          <strong><%= course.name %></strong><br />
-          ₹<%= course.price %>
+        <% if (cart.length === 0) { %>
+        <p class="empty-cart">No items in cart.</p>
+        <% } else { %>
+
+        <div class="content">
+          <!-- Left Side: Cart Items -->
+          <div class="cart_items">
+            <% cart.forEach(course => { %>
+            <div class="cart_product">
+              <img
+                class="product-img"
+                src="<%= course.image %>"
+                alt="Course Image"
+              />
+              <div class="cart_info">
+                <strong><%= course.name %></strong><br />
+                ₹<%= course.price %>
+              </div>
+              <form
+                action="/remove-from-cart"
+                method="POST"
+                class="remove-form"
+              >
+                <input type="hidden" name="id" value="<%= course.id %>" />
+                <button type="submit" class="delete_btn">
+                  <i
+                    class="bi bi-trash"
+                    style="font-size: 20px; color: red"
+                  ></i>
+                </button>
+              </form>
+            </div>
+            <% }) %>
+          </div>
+
+          <!-- Right Side: Summary -->
+          <div class="summary_section">
+            <h2>Order Summary</h2>
+
+            <div class="summary_price">
+              <div>
+                <h4>Subtotal</h4>
+                <span
+                  >₹<%= cart.reduce((sum, item) => sum + item.price, 0) %></span
+                >
+              </div>
+              <div class="Delivery">
+                <h4>Delivery</h4>
+                <span>Free</span>
+              </div>
+              <div>
+                <h4>Total</h4>
+                <span
+                  >₹<%= cart.reduce((sum, item) => sum + item.price, 0) %></span
+                >
+              </div>
+            </div>
+
+            <form action="/checkout" method="POST">
+              <button class="checkout" type="submit">
+                Proceed to Checkout
+              </button>
+            </form>
+          </div>
         </div>
-        <div class="cart-actions">
-          <form action="/remove-from-cart" method="POST">
-            <input type="hidden" name="id" value="<%= course.id %>" />
-            <button class="btn btn-remove" type="submit">Remove</button>
-          </form>
-        </div>
+
+        <% } %>
       </div>
-      <% }) %>
-
-      <form action="/checkout" method="POST">
-        <button class="btn btn-checkout" type="submit">
-          Proceed to Checkout
-        </button>
-      </form>
-      <% } %>
     </div>
+
+    <%- include("partials/footer") %>
   </body>
 </html>

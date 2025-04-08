@@ -10,6 +10,9 @@
 
     <div class="nav-right">
       <% if (locals.user) { %>
+      <a href="/cart" class="icon-cart" title="Cart">
+        <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
+      </a>
       <a href="/mylearning">My Learning</a>
       <a href="/profile" id="user-profile-link" title="Profile">
         <div
@@ -29,13 +32,12 @@
         </div>
       </a>
       <% } else { %>
-      <a href="/login">Login</a>
-      <a href="/signup">Sign Up</a>
-      <% } %>
-
       <a href="/cart" class="icon-cart" title="Cart">
         <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
       </a>
+      <a href="/login">Login</a>
+      <a href="/signup">Sign Up</a>
+      <% } %>
     </div>
   </nav>
 </header>

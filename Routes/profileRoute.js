@@ -19,7 +19,7 @@ router.get("/learn/:id", async (req, res) => {
     );
 
     if (purchaseCheck.rows.length === 0) {
-      return res.send("You have not purchased this course."); // or redirect to purchase page
+      res.redirect("/");
     }
 
     // ✅ Fetch the course

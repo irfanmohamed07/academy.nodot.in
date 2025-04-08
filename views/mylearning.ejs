@@ -1,21 +1,141 @@
-<%- include("partials/header") %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>My Learning</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .container {
+        /* max-width: 1200px;
+        margin: 40px auto; */
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+      }
 
-<section class="container">
-  <h1>My Learning</h1>
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        color: #2c3e50;
+        text-align: center;
+      }
 
-  <% if (courses.length > 0) { %>
-  <div class="course-grid">
-    <% courses.forEach(course => { %>
-    <div class="course-card">
-      <h2><%= course.name %></h2>
-      <p><%= course.description %></p>
-      <a href="/learn/<%= course.id %>">View Course</a>
-    </div>
-    <% }) %>
-  </div>
-  <% } else { %>
-  <p>You haven’t purchased any courses yet.</p>
-  <% } %>
-</section>
+      .course-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
 
-<%- include("partials/footer") %>
+      .course-card {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .course-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+
+      .course-card-content {
+        padding: 15px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .course-card h2 {
+        font-size: 1.3rem;
+        margin: 0 0 10px;
+        color: #1a1a1a;
+      }
+
+      .course-card p {
+        font-size: 0.95rem;
+        color: #555;
+        margin-bottom: 15px;
+        flex-grow: 1;
+      }
+
+      .course-card a {
+        align-self: flex-start;
+        text-decoration: none;
+        padding: 10px 16px;
+        background: #007bff;
+        color: white;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: background 0.3s ease;
+      }
+
+      .course-card a:hover {
+        background: #0056b3;
+      }
+
+      p {
+        text-align: center;
+        font-size: 1.1rem;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        .course-card img {
+          height: 150px;
+        }
+
+        .course-card h2 {
+          font-size: 1.1rem;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <%- include("partials/header") %>
+
+    <section class="container">
+      <h1>My Learning</h1>
+
+      <% if (courses.length > 0) { %>
+      <div class="course-grid">
+        <% courses.forEach(course => { %>
+        <div class="course-card">
+          <img
+            src="<%= course.image_url %>"
+            alt="<%= course.name %> Thumbnail"
+          />
+          <div class="course-card-content">
+            <h2><%= course.name %></h2>
+            <p><%= course.description %></p>
+            <a href="/learn/<%= course.id %>">View Course</a>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <% } else { %>
+      <p>You haven’t purchased any courses yet.</p>
+      <% } %>
+    </section>
+
+    <%- include("partials/footer") %>
+  </body>
+</html>

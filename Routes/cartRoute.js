@@ -7,7 +7,7 @@ let cart = [];
 
 // GET cart page
 router.get("/cart", (req, res) => {
-  res.render("cart", { cart });
+  res.render("cart", { cart, user: req.session.user || null });
 });
 
 // ADD to cart
