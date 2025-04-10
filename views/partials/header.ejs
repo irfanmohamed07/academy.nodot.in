@@ -2,46 +2,58 @@
   <nav class="navbar">
     <div class="logo">
       <img src="../images/logo.jpg" alt="error loading" />
-      <span>Nodot Acadamy</span>
+      <span>Nodot Academy</span>
     </div>
 
+    <!-- Mobile menu toggle (hamburger) -->
+    <div class="menu-toggle" id="menu-toggle">☰</div>
+
+    <!-- Desktop navigation (hidden on mobile) -->
     <div class="nav-center">
-      <a class="active" href="#"><i class="fa fa-fw fa-home"></i> Home</a>
+      <a class="active" href="/"><i class="fa fa-fw fa-home"></i> Home</a>
       <a href="#about">About</a>
       <a href="#courses">Courses</a>
     </div>
 
+    <!-- Desktop right-side navigation with cart and profile -->
     <div class="nav-right">
       <% if (locals.user) { %>
       <a href="/cart" class="icon-cart" title="Cart">
         <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
       </a>
-      <a href="/mylearning">My Learning</a>
+      <a href="/mylearning" class="my-learning-link">My Learning</a>
       <a href="/profile" id="user-profile-link" title="Profile">
-        <div
-          class="user-initial"
-          style="
-            display: inline-block;
-            background: #000;
-            color: #fff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-          "
-        >
+        <div class="user-initial">
           <%= user.name ? user.name.charAt(0).toUpperCase() : "U" %>
         </div>
       </a>
       <% } else { %>
-      <a href="/login">Login</a>
-      <a href="/signup">Sign Up</a>
-      <% } %>
-
       <a href="/cart" class="icon-cart" title="Cart">
         <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
       </a>
+      <a class="nav-center" href="/login">
+        <i class="fa fa-fw fa-user"></i> Login
+      </a>
+      <a class="nav-center" href="/signup">Sign Up</a>
+      <% } %>
+    </div>
+
+    <!-- Mobile dropdown menu (hidden by default) -->
+    <div class="mobile-menu" id="mobile-menu">
+      <a class="active" href="/"><i class="fa fa-fw fa-home"></i> Home</a>
+      <a href="#about">About</a>
+      <a href="#courses">Courses</a>
+      <a href="/cart" class="icon-cart" title="Cart">
+        <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
+      </a>
+      <% if (locals.user) { %>
+      <a href="/mylearning">My Learning</a>
+      <a href="/profile" id="user-profile-link" title="Profile">
+        <div class="user-initial">
+          <%= user.name ? user.name.charAt(0).toUpperCase() : "U" %>
+        </div>
+      </a>
+      <% } else { %>
       <a href="/login">Login</a>
       <a href="/signup">Sign Up</a>
       <% } %>

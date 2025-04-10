@@ -39,7 +39,11 @@ router.get("/course/:id", async (req, res) => {
     })
   );
 
-  res.render("course-details", { course, sections });
+  res.render("course-details", {
+    course,
+    sections,
+    user: req.session.user || null,
+  });
 });
 
 router.get("/mylearning", async (req, res) => {

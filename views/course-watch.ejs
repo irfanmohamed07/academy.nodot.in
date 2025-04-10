@@ -13,114 +13,321 @@
       }
 
       .container {
-        /* max-width: 1200px; */
-        /* margin: 40px auto; */
         padding: 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+        margin: auto;
       }
 
       h1 {
         font-size: 2em;
-        margin-bottom: 10px;
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 20px;
       }
 
       .course-content {
         display: flex;
-        gap: 30px;
-        margin-top: 30px;
+        gap: 20px;
       }
 
       .video-player {
         flex: 2;
       }
 
-      .video-player video {
+      .video-player video,
+      .video-player iframe {
         width: 100%;
         height: 400px;
-        border-radius: 10px;
+        object-fit: cover;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
 
       .content-list {
         flex: 1;
-        max-height: 400px;
-        overflow-y: auto;
-        padding: 10px;
+        padding: 15px;
         background: #f9f9f9;
-        border-radius: 10px;
         border: 1px solid #ddd;
+        overflow-y: auto;
+      }
+
+      .accordion-item {
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+
+      .accordion-header {
+        width: 100%;
+        padding: 10px 15px;
+        text-align: left;
+        background-color: #f1f1f1;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        outline: none;
+      }
+
+      .accordion-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background: #fff;
+        padding: 0 15px;
+      }
+
+      .accordion-body.show {
+        padding: 10px 15px;
+        max-height: 1000px;
+      }
+
+      .arrow {
+        transition: transform 0.3s ease;
+      }
+
+      .arrow.rotate {
+        transform: rotate(180deg);
       }
 
       .module-item {
         margin-bottom: 15px;
+        border-bottom: 1px dotted #343536;
       }
 
       .module-item input[type="checkbox"] {
         margin-right: 8px;
       }
 
-      .module-item label {
+      .module-item label,
+      .module-item button {
         cursor: pointer;
         color: #333;
+        background: none;
+        border: none;
+        font-size: 1rem;
+        padding: 0;
       }
 
-      .module-item label:hover {
+      .module-item label:hover,
+      .module-item button:hover {
         color: #007bff;
       }
+
+      .module-item.active {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding-left: 6px;
+      }
+
+      @media (max-width: 1024px) {
+        .video-player video {
+          height: 320px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .course-content {
+          flex-direction: column;
+        }
+
+        .video-player,
+        .content-list {
+          width: 100%;
+        }
+
+        .video-player video {
+          height: auto;
+        }
+      }
+
+      @media (max-width: 480px), (max-width: 765px) {
+        h1 {
+          font-size: 1.6rem;
+          text-align: center;
+        }
+
+        .container {
+          padding: 10px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .course-content {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .video-player,
+        .content-list {
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .content-list {
+          padding: 10px;
+          overflow-x: hidden;
+        }
+
+        .module-item label {
+          font-size: 0.95rem;
+          word-wrap: break-word;
+        }
+      }
     </style>
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
+    <%- include('partials/header') -%>
+
     <div class="container">
       <h1><%= course.name %></h1>
-      <p><%= course.description %></p>
-
       <div class="course-content">
-        <!-- Left: Single Video Player -->
-        <div class="video-player">
-          <video id="mainVideo" controls>
-            <source id="videoSource" src="" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
+        <div
+          id="mainVideo"
+          class="video-player"
+          controls
+          autoplay
+          controlsList="nodownload"
+        ></div>
 
-        <!-- Right: Module List with Checkboxes -->
         <div class="content-list">
-          <% sections.forEach(function(section) { %>
-          <h3><%= section.title %></h3>
-          <% section.modules.forEach(function(module) { %>
-          <div class="module-item">
-            <input
-              type="checkbox"
-              id="module_<%= module.id %>"
-              onclick="loadVideo('<%= module.video_url %>')"
-            />
-            <label for="module_<%= module.id %>">
-              <%= module.title %> (<%= module.duration %>)
-            </label>
+          <h2 style="text-align: center">Course Contents</h2>
+          <% sections.forEach(function(section, index) { %>
+          <div class="accordion-item">
+            <button
+              class="accordion-header"
+              onclick="toggleAccordion(<%= index %>)"
+            >
+              <%= section.title %>
+              <span class="arrow" id="arrow_<%= index %>">&#9660;</span>
+            </button>
+            <div class="accordion-body" id="body_<%= index %>">
+              <% section.modules.forEach(function(module) { %>
+              <div class="module-item">
+                <input type="checkbox" id="check_<%= module.id %>" <%=
+                watchedModules.includes(module.id) ? "checked" : "" %>
+                onchange="updateProgress(<%= module.id %>, this.checked)" />
+                <button onclick="loadVideo('<%= module.video_url %>', this)">
+                  <%= module.title %> (<%= module.duration %>)
+                </button>
+              </div>
+              <% }); %>
+            </div>
           </div>
-          <% }); %> <% }); %>
+          <% }); %>
         </div>
       </div>
     </div>
 
+    <%- include('partials/footer') -%>
+
     <script>
-      function loadVideo(url) {
-        const video = document.getElementById("mainVideo");
-        const source = document.getElementById("videoSource");
-        source.src = url;
-        video.load();
-        video.play();
+      const email = "<%= user.email %>";
+
+      let currentVideoElement = null;
+      let currentVideoUrl = "";
+      let progressChecked = false;
+
+      function loadVideo(url, element) {
+        const videoContainer = document.getElementById("mainVideo");
+        currentVideoUrl = url;
+        progressChecked = false;
+
+        // Remove active class from all
+        document
+          .querySelectorAll(".module-item")
+          .forEach((item) => item.classList.remove("active"));
+
+        // Set active class to current
+        if (element) {
+          element.closest(".module-item").classList.add("active");
+        }
+
+        // Insert video HTML
+        videoContainer.innerHTML = `
+    <video id="courseVideo" controls autoplay controlsList="nodownload" oncontextmenu="return false" width="640" height="360">
+      <source src="${url}" type="video/mp4" />
+      <track src="/captions.vtt" kind="subtitles" srclang="en" label="English" default>
+      Your browser does not support HTML5 video.
+    </video>
+  `;
+
+        // Wait for the DOM to update, then get the video element
+        setTimeout(() => {
+          currentVideoElement = document.getElementById("courseVideo");
+          attachVideoEvents(currentVideoElement, element);
+        }, 0);
       }
 
-      // Optional: Auto-load first video
-      window.onload = function () {
-        const firstCheckbox = document.querySelector(
-          '.content-list input[type="checkbox"]'
+      function attachVideoEvents(video, buttonElement) {
+        const checkbox = buttonElement
+          ?.closest(".module-item")
+          ?.querySelector('input[type="checkbox"]');
+
+        if (!video) return;
+
+        video.addEventListener("timeupdate", () => {
+          if (!progressChecked && video.currentTime >= 0.9 * video.duration) {
+            if (checkbox && !checkbox.checked) {
+              checkbox.checked = true;
+              updateProgress(checkbox.id.split("_")[1], true); // module.id is in id="check_ID"
+              progressChecked = true;
+            }
+          }
+        });
+
+        video.addEventListener("ended", () => {
+          playNextVideo();
+        });
+      }
+
+      function playNextVideo() {
+        const moduleButtons = Array.from(
+          document.querySelectorAll(".module-item button")
         );
-        if (firstCheckbox) {
-          firstCheckbox.click();
+        const currentIndex = moduleButtons.findIndex((btn) =>
+          btn.closest(".module-item").classList.contains("active")
+        );
+
+        if (currentIndex >= 0 && currentIndex < moduleButtons.length - 1) {
+          const nextButton = moduleButtons[currentIndex + 1];
+          nextButton.click();
+        } else {
+          console.log("All videos completed.");
+        }
+      }
+
+      function toggleAccordion(index) {
+        const body = document.getElementById(`body_${index}`);
+        const arrow = document.getElementById(`arrow_${index}`);
+        body.classList.toggle("show");
+        arrow.classList.toggle("rotate");
+      }
+
+      function updateProgress(moduleId, watched) {
+        fetch("/update-video-progress", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            module_id: moduleId,
+            watched,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => console.log(data.message))
+          .catch((err) => console.error("Error:", err));
+      }
+
+      window.onload = function () {
+        const firstVideoBtn = document.querySelector(".module-item button");
+        if (firstVideoBtn) {
+          firstVideoBtn.click();
         }
       };
     </script>
