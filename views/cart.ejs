@@ -46,7 +46,7 @@
         font-size: 14px;
       }
       .apply_code button {
-        background-color: #000;
+        background-color: #00b894;
         color: #fff;
         font-size: 16px;
         font-weight: 700;
@@ -92,7 +92,7 @@
       }
       .checkout {
         width: 100%;
-        background-color: #000;
+        background-color: #00b894;
         color: #fff;
         border: none;
         font-size: 16px;
@@ -116,10 +116,8 @@
       }
 
       .product-img {
-        width: 90px;
+        width: 120px;
         height: 90px;
-        border-radius: 15px;
-        object-fit: cover;
         margin-right: 20px;
         border: 1px solid #ddd;
       }
@@ -280,32 +278,49 @@
               </form>
             </div>
             <% }) %>
+            <button class="checkout" onclick="window.location.href='/';">
+              Browse more courses
+            </button>
           </div>
 
           <!-- Right Side: Summary -->
           <div class="summary_section">
+            <div class="Promotional_code">
+              <h2>Do you have a Promotional Code?</h2>
+              <form method="POST" action="/promo-code">
+                <div class="apply_code">
+                  <input
+                    type="text"
+                    id="code"
+                    name="code"
+                    placeholder="Promo code"
+                  />
+                  <button type="submit">Apply</button>
+                </div>
+              </form>
+              <div class="promo-message">
+                <% if (locals.successMessage) { %>
+                <p style="color: green"><%= successMessage %></p>
+                <% } else if (locals.errorMessage) { %>
+                <p style="color: red"><%= errorMessage %></p>
+                <% } %>
+              </div>
+            </div>
             <h2>Order Summary</h2>
-
             <div class="summary_price">
               <div>
                 <h4>Subtotal</h4>
-                <span
-                  >₹<%= cart.reduce((sum, item) => sum + item.price, 0) %></span
-                >
+                <span>₹<%= total %></span>
               </div>
-              <div class="Delivery">
-                <h4>Delivery</h4>
-                <span>Free</span>
-              </div>
+
               <div>
                 <h4>Total</h4>
-                <span
-                  >₹<%= cart.reduce((sum, item) => sum + item.price, 0) %></span
-                >
+                <span>₹<%= total%></span>
               </div>
             </div>
 
             <form action="/checkout" method="POST">
+              <input type="hidden" name="total" value="<%= total %>" />
               <button class="checkout" type="submit">
                 Proceed to Checkout
               </button>
