@@ -97,7 +97,7 @@ function createSecureVideoUrl(videoPath, req) {
  * API endpoint to securely serve video content
  * This endpoint validates user's session and module access
  */
-router.get('/api/secure-video/module/:moduleId', async (req, res) => {
+router.get('/api/secure-video/:securityId', async (req, res) => {
   try {
     // Only allow authenticated users to access videos
     if (!req.session.isAuthenticated || !req.session.email) {
@@ -105,11 +105,12 @@ router.get('/api/secure-video/module/:moduleId', async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     
-    const moduleId = req.params.moduleId;
+    const securityId = req.params.securityId;
+    const moduleId = req.query.moduleId;
     const userEmail = req.session.email;
     
-    if (!moduleId) {
-      return res.status(400).json({ error: 'Missing module ID' });
+    if (!moduleId || !securityId) {
+      return res.status(400).json({ error: 'Missing module ID or security ID' });
     }
     
     // Verify this user has access to this course's videos
@@ -124,6 +125,9 @@ router.get('/api/secure-video/module/:moduleId', async (req, res) => {
     if (moduleResult.rows.length === 0) {
       return res.status(404).json({ error: 'Module not found' });
     }
+    
+    // Log the module's security ID for debugging
+    console.log(`Module ${moduleId} security ID: ${securityId}`);
     
     const courseId = moduleResult.rows[0].course_id;
     
@@ -147,6 +151,9 @@ router.get('/api/secure-video/module/:moduleId', async (req, res) => {
     if (!videoUrl) {
       return res.status(404).json({ error: 'Video not available' });
     }
+    
+    // Security check passed, log successful access
+    console.log(`Secure video access granted: Module ${moduleId} for ${userEmail}`);
     
     // Create a secure URL with short expiration
     const secureUrl = createSecureVideoUrl(videoUrl, req);
@@ -200,7 +207,7 @@ export function generateSecureVideoScript(sessionToken) {
     
     // Function to securely load a video when needed
     async function secureLoadVideo(securityId, moduleId) {
-      console.log("Loading secure video:", securityId.substring(0, 24) + "...", moduleId);
+      console.log("Loading secure video:", securityId, "for module:", moduleId);
       
       // If already loading, don't start again
       if (loadingVideos[securityId]) return loadingVideos[securityId];
@@ -321,7 +328,52 @@ router.post("/update-video-progress", async (req, res) => {
       );
     }
 
-    res.json({ success: true });
+    // Get the module details to find the course ID
+    const moduleResult = await pool.query(
+      `SELECT m.*, s.course_id 
+       FROM modules m
+       JOIN sections s ON m.section_id = s.id
+       WHERE m.id = $1`,
+      [module_id]
+    );
+    
+    if (moduleResult.rows.length > 0) {
+      const courseId = moduleResult.rows[0].course_id;
+      
+      // Calculate course completion percentage
+      const progressResult = await pool.query(
+        `
+        SELECT 
+          COUNT(DISTINCT m.id) AS total_modules,
+          COUNT(DISTINCT vp.module_id) AS completed_modules
+        FROM courses c
+        JOIN sections s ON s.course_id = c.id
+        JOIN modules m ON m.section_id = s.id
+        LEFT JOIN video_progress vp 
+          ON vp.module_id = m.id AND vp.email = $1 AND vp.watched = true
+        WHERE c.id = $2
+        `,
+        [email, courseId]
+      );
+      
+      if (progressResult.rows.length > 0) {
+        const { total_modules, completed_modules } = progressResult.rows[0];
+        const completionPercentage = 
+          total_modules > 0
+            ? Math.round((completed_modules / total_modules) * 100)
+            : 0;
+            
+        return res.json({ 
+          success: true, 
+          message: "Progress updated successfully", 
+          completionPercentage: completionPercentage,
+          totalModules: total_modules,
+          completedModules: completed_modules
+        });
+      }
+    }
+
+    res.json({ success: true, message: "Progress updated successfully" });
   } catch (err) {
     console.error("Error updating video progress:", err);
     res.status(500).json({ error: "Server error" });

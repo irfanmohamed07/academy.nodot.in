@@ -34,6 +34,14 @@ const app = express();
 const port = 4000;
 
 app.set("view engine", "ejs");
+
+// Serve static files with CORS headers
+app.use('/favicon', express.static(path.join(__dirname, 'public/favicon'), {
+  setHeaders: function (res, path) {
+    res.set('Access-Control-Allow-Origin', '*');
+  }
+}));
+
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // This parses incoming JSON requests
@@ -51,9 +59,29 @@ const allowedOrigins = [
   "http://localhost:4000", 
   "https://localhost:4000",
   "http://academy.nodot.in",
-  "https://academy.nodot.in"
+  "https://academy.nodot.in",
+  "https://render.com",
+  "https://*.render.com"
 ];
 
+// Middleware to check if request is for static assets
+app.use((req, res, next) => {
+  const isStaticAsset = req.path.match(/\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|eot)$/i);
+  
+  if (isStaticAsset) {
+    // Allow all static assets without CORS restrictions
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+  }
+  next();
+});
+
+// Standard CORS for API endpoints
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -64,8 +92,10 @@ app.use(
         return callback(null, true);
       }
       
-      // Check if origin contains CloudFront domain
-      if (origin.includes('cloudfront.net')) {
+      // Check if origin contains allowed domains
+      if (origin.includes('cloudfront.net') || 
+          origin.includes('render.com') || 
+          origin.includes('nodot.in')) {
         return callback(null, true);
       }
       
@@ -99,17 +129,27 @@ app.use((req, res, next) => {
 // SEO Enhancements
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain');
+  res.header('Access-Control-Allow-Origin', '*');
   res.sendFile(path.join(__dirname, 'public/robots.txt'));
 });
 
 app.get('/sitemap.xml', (req, res) => {
   res.type('application/xml');
+  res.header('Access-Control-Allow-Origin', '*');
   res.sendFile(path.join(__dirname, 'public/sitemap.xml'));
 });
 
 // Route for favicon
 app.get('/favicon.ico', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
   res.sendFile(path.join(__dirname, 'public/favicon/favicon.ico'));
+});
+
+// Explicit routes for favicon files to ensure they're served properly
+app.get('/favicon/:filename', (req, res) => {
+  const filename = req.params.filename;
+  res.header('Access-Control-Allow-Origin', '*');
+  res.sendFile(path.join(__dirname, 'public/favicon', filename));
 });
 
 app.use("/", homeRoute);
