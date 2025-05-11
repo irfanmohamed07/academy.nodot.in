@@ -75,22 +75,23 @@ body {
 .register-container .submit-button {
   width: 100%;
   padding: 10px;
-  background-color: #333;
+  background-color: #5624d0;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+  transition: background-color 0.3s;
 }
 
 .register-container .submit-button:hover {
-  background-color: #555;
+  background-color: #401b9c;
 }
 
 .register-container a {
   display: block;
   margin-top: 10px;
-  color: #333;
+  color: #5624d0;
   text-decoration: none;
 }
 

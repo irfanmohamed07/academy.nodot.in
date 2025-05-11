@@ -4,19 +4,26 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "setup-video-security": "node scripts/setup-video-security.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.6.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
+    "nodemailer": "^6.10.1",
     "pg": "^8.14.1",
     "razorpay": "^2.9.6",
     "session": "^0.1.0"

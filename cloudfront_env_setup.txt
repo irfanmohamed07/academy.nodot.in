@@ -1,0 +1,25 @@
+# CloudFront Environment Variables Setup
+
+Add the following environment variables to your .env file:
+
+```
+# CloudFront Configuration
+CLOUDFRONT_DOMAIN=d3kpn8l37jcfni.cloudfront.net
+CLOUDFRONT_KEY_PAIR_ID=E2GCW89YXXH3SR
+# The CloudFront private key must be properly formatted with \n for line breaks
+CLOUDFRONT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCWP1MPNuz5dST...rest of your private key...\n-----END PRIVATE KEY-----"
+```
+
+Instructions:
+
+1. The Key-Pair-ID (E2GCW89YXXH3SR) looks correct - this is what AWS assigned when the CloudFront key pair was created.
+
+2. For the CLOUDFRONT_PRIVATE_KEY:
+   - You need to use the private key that corresponds to the key pair ID E2GCW89YXXH3SR
+   - This is the .pem file that was downloaded when the key pair was created in AWS
+   - Make sure it has proper line breaks with \n characters
+   - It must begin with "-----BEGIN PRIVATE KEY-----\n" and end with "\n-----END PRIVATE KEY-----"
+
+3. Make sure there are no spaces before or after the = sign in your .env file
+
+4. Restart your application after adding these variables 

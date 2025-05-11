@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="css/adminpanel.css">
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Admin Panel</h2>
+      <ul>
+        <li><a href="#" id="users-link">Users</a></li>
+        <li><a href="#" id="login-link">Add course</a></li>
+        <li><a href="#" id="forms-link">Courses</a></li>
+        <li><a href="#" id="adminlogin-link">Sections</a></li>
+        <li><a href="#" id="notes-link"> Promo code</a></li>
+         
+         
+        <li><a href="#" id="adminusers-link">Module</a></li>
+        <li><a href="#" id="vedioprogress-link">Course Progress</a></li>
+        <li><a href="#" id="certificate-link">Certificate</a></li>
+        <li><a href="#" id="purchases-link">Purchases</a></li>
+        <li><a href="#" id="payment-link">Payment History</a></li>
+         
+        <!-- <li><a href="#" id="changepassword-link">Change Password</a></li>
+        <li><a href="#" id="registeradmin-link">Register Admin</a></li> -->
+         
+     </ul> 
+    </div>
+  
+  
+    <div class="three-dot-menu">
+      <i class="fas fa-ellipsis-v"></i>
+      <div class="menu-content">
+        <ul>
+          <li><a href="#" data-section="users-section">Users</a></li>
+          <li><a href="#" data-section="login-section">Add course</a></li>
+          <li><a href="#" data-section="forms-section">Courses</a></li>
+          
+          <li><a href="#" data-section="notes-section">promo code</a></li>
+           
+          <li><a href="#" data-section="adminlogin-section">Sections</a></li>
+          <!-- <li><a href="#" data-section="changepassword-section">Change Password</a></li>
+          <li><a href="#" data-section="registeradmin-section">Register Admin</a></li> -->
+          <li><a href="#" data-section="adminusers-section">Module</a></li>
+          <li><a href="#" data-section="vedioprogress-section">Course progress</a></li>
+          <li><a href="#" id="certificate-section">Certificate</a></li>
+          <li><a href="#" id="purchases-section">purchase</a></li>
+          <li><a href="#" id="payment-section">Payment History</a></li>
+        </ul>
+      </div>
+    </div>
+     
+
+    <div class="main-content">
+      <!-- Users Section -->
+      <div id="users-section" class="content-section">
+        <h3>Users</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Mobile Number</th>
+              <th>Password</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (users && users.length > 0) { %>
+              <% users.forEach(user => { %>
+                <tr>
+                  <td><%= user.id %></td>
+                  <td><%= user.name %></td>
+                  <td><%= user.email %></td>
+
+                  <td><%= user.password %></td>
+                  <td><%= user.mobile %></td>
+                  <td>
+                    <form style="padding: 0; margin: 0;" method="post" action="/deleteuser/<%= user.id %>">
+                    <button type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="4">No users found.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Login Attempts Section -->
+      <div id="login-section" class="content-section">
+        <h2>Add courses</h2>
+        <h2>Add New Course</h2>
+<form action="/add-course" method="POST" style="max-width: 600px; margin: auto;">
+  
+  <label for="name">Course Name:</label>
+  <input type="text" name="name" required />
+
+  <label for="image_url">Image URL:</label>
+  <input type="text" name="image_url" />
+
+  <label for="description">Description:</label>
+  <textarea name="description"></textarea>
+
+  <label for="price">Price (INR):</label>
+  <input type="number" name="price" required />
+
+  <label for="full_content">Full Content:</label>
+  <textarea name="full_content" rows="4"></textarea>
+
+  <label for="language">Language:</label>
+  <input type="text" name="language" />
+
+  <label for="instructor">Instructor:</label>
+  <input type="text" name="instructor" />
+
+  <label for="duration">Duration:</label>
+  <input type="text" name="duration" />
+
+  <label for="vedio_duration">Video Duration:</label>
+  <input type="text" name="vedio_duration" placeholder="e.g., 2 hours" />
+
+  <button type="submit" style="margin-top: 10px;">Add Course</button>
+</form>
+
+          
+      </div>
+
+      <!-- Add Notes Section -->
+      <div id="notes-section" class="content-section">
+         
+        
+        <h2>Add New Promo Code</h2>
+        <form method="POST" action="/addpromocode">
+          <label for="code">Promo Code:</label>
+          <input type="text" name="code" required />
+        
+          <label for="price_offer">Price Offer (in INR):</label>
+          <input type="number" name="price_offer" step="0.01" required />
+        
+          <button type="submit">Add Promo Code</button>
+        </form>
+        
+        <table border="1">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Promo Code</th>
+                <th>Price Offer (INR)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% promo_codes.forEach(function(promo) { %>
+                <tr>
+                  <td><%= promo.id %></td>
+                  <td><%= promo.code %></td>
+                  <td><%= promo.price_offer %></td>
+                  <td>
+                    <form method="POST" action="/deletepromocode/<%= promo.id %>">
+                      <button type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+       
+         </div>
+
+      <!-- Forms Section -->
+      <div id="forms-section" class="content-section">
+         
+        <h2>Courses</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Course Name</th>
+      <th>Price</th>
+      <th>Instructor</th>
+      <th>Language</th>
+      <th>Duration</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% courses.forEach(course => { %>
+      <tr>
+        <td><%= course.id %></td>
+        <td><%= course.name %></td>
+        <td><%= course.price %></td>
+        <td><%= course.instructor %></td>
+        <td><%= course.language %></td>
+        <td><%= course.duration %></td>
+        <td>
+            <form style="padding: 0; margin: 0;" method="post" action="/deletecourse/<%= course.id %>">
+            <button type="submit">Delete</button>
+            </form>
+          </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+          
+      </div>
+
+      <!-- Admin Logins Section -->
+      <div id="adminlogin-section" class="content-section">
+        <h2>Add New Section</h2>
+        <form method="POST" action="/addsection">
+          <label for="course_id">Course ID:</label>
+          <input type="number" name="course_id" required />
+        
+          <label for="title">Section Title:</label>
+          <input type="text" name="title" required />
+        
+          <button type="submit">Add Section</button>
+        </form>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>COURSE ID</th>
+              <th>TITLE</th>
+              <th>ACTION</th>
+               
+               
+
+            </tr>
+          </thead>
+          <tbody>
+            <% sections.forEach(section => { %>
+                <tr>
+                  <td><%= section.id %></td>
+                  <td><%= section.course_id %></td>
+                  <td><%= section.title %></td>
+                  <td>
+                    <form style="padding: 0; margin: 0;" method="post" action="/deletesection/<%= section.id %>">
+                    <button type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+             
+          </tbody>
+        </table>
+      </div>
+
+      <div id="adminusers-section" class="content-section">
+        <h2>Add Module</h2>
+        <form action="/addmodule" method="POST">
+          <label for="section_id">Section ID:</label>
+          <select name="section_id" required>
+            <!-- Populate this select field with section IDs dynamically from the database -->
+            <% sections.forEach(function(section) { %>
+              <option value="<%= section.id %>"><%= section.title %></option>
+            <% }); %>
+          </select>
+        
+          <label for="title">Module Title:</label>
+          <input type="text" name="title" required />
+        
+          <label for="video_url">Video URL/Path:</label>
+          <input type="text" name="video_url" required placeholder="e.g., videos/course1/video.mp4 or full URL" />
+          <p style="font-size: 12px; color: #666; margin-top: 2px;">
+            For CloudFront: Enter the path only (e.g., videos/course1/video.mp4)<br>
+            For direct links: Enter the complete URL (starting with http://)
+          </p>
+        
+          <label for="duration">Duration (optional):</label>
+          <input type="text" name="duration" placeholder="e.g., 12:34" />
+        
+          <button type="submit">Add Module</button>
+        </form>
+        <table border="1">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Section ID</th>
+                <th>Title</th>
+                <th>Video URL</th>
+                <th>Duration</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% modules.forEach(function(module) { %>
+                <tr>
+                  <td><%= module.id %></td>
+                  <td><%= module.section_id %></td>
+                  <td><%= module.title %></td>
+                  <td>
+                    <% if (module.video_url) { %>
+                      <% const isFullUrl = module.video_url.startsWith('http'); %>
+                      <a href="<%= module.video_url %>" target="_blank">View Source</a>
+                      <br>
+                      <% 
+                        let testPath = '';
+                        let queryParam = '';
+                        if (isFullUrl) {
+                          if (module.video_url.includes('Signature=')) {
+                            // It's a signed URL
+                            testPath = 'signed';
+                            queryParam = module.video_url;
+                          } else if (module.video_url.includes('cloudfront.net/')) {
+                            // It's a CloudFront URL
+                            const parts = module.video_url.split('cloudfront.net/');
+                            if (parts.length > 1) {
+                              testPath = 'path';
+                              queryParam = parts[1];
+                            } else {
+                              testPath = 'direct';
+                              queryParam = module.video_url;
+                            }
+                          } else {
+                            // Any other URL
+                            testPath = 'direct';
+                            queryParam = module.video_url;
+                          }
+                        } else {
+                          testPath = 'path';
+                          queryParam = module.video_url;
+                        }
+                      %>
+                      <a href="/test-video/<%= testPath %>?path=<%= encodeURIComponent(queryParam) %>" target="_blank">Test Play</a>
+                      <br>
+                      <small style="font-size: 10px; word-break: break-all; color: #666;">
+                        <%= module.video_url %>
+                      </small>
+                    <% } else { %>
+                      No URL
+                    <% } %>
+                  </td>
+                  <td><%= module.duration %></td>
+                  <td>
+                    <form method="POST" action="/deletemodule/<%= module.id %>">
+                      <button type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        
+      </div>
+
+
+
+      <div id="vedioprogress-section" class="content-section">
+   <!-- Video Progress Table -->
+<h3>Video Progress</h3>
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>User Name</th>
+      <th>Email</th>
+      <th>Module Title</th>
+      <th>Watched</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% video_progress.forEach(function(progress) { %>
+      <tr>
+        <td><%= progress.id %></td>
+        <td><%= progress.user_name %></td>
+        <td><%= progress.email %></td>
+        <td><%= progress.module_title %></td>
+        <td><%= progress.watched ? "Yes" : "No" %></td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+      </div>
+       
+       
+      
+      <div id="certificate-section" class="content-section">
+        <h1>Certificate </h1>
+        <table border="1">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Course Name</th>
+                <th>Certificate Code</th>
+                <th>User Name</th>
+                <th>Issued At</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% certificates.forEach(function(certificate) { %>
+                <tr>
+                  <td><%= certificate.id %></td>
+                  <td><%= certificate.email %></td>
+                  <td><%= certificate.course_name %></td>
+                  <td><%= certificate.certificate_code %></td>
+                  <td><%= certificate.user_name %></td>
+                  <td><%= certificate.issued_at %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+           </div>
+
+
+           <div id="purchases-section" class="content-section">
+            <h1>Purchases </h1>
+            
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>User Name</th>
+      <th>Email</th>
+      <th>Course Name</th>
+      <th>Purchased At</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% purchases.forEach(function(purchase) { %>
+      <tr>
+        <td><%= purchase.id %></td>
+        <td><%= purchase.user_name %></td>
+        <td><%= purchase.email %></td>
+        <td><%= purchase.course_name %></td>
+        <td><%= purchase.purchased_at %></td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+
+ 
+               </div>
+
+               <div id="payment-section" class="content-section">
+                <!-- Payment History Table -->
+<h3>Payment History</h3>
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>User Email</th>
+      <th>Payment ID</th>
+      <th>Order ID</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Payment Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% payment_history.forEach(function(payment) { %>
+      <tr>
+        <td><%= payment.id %></td>
+        <td><%= payment.email %></td>
+        <td><%= payment.payment_id %></td>
+        <td><%= payment.order_id %></td>
+        <td><%= payment.amount %></td>
+        <td><%= payment.status %></td>
+        <td><%= payment.payment_date %></td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+
+                   </div>
+
+      <div id="changepassword-section" class="content-section">
+        <div class="change-password-form-container">
+          <form id="changePasswordForm" method="post" action="/changeadminpassword">
+            <div class="change-password-form-group">
+              <label for="oldPassword">Old Password:</label>
+              <input type="password" name="oldPassword" id="oldPassword" required>
+              <i id="toggleOldPassword" class="fa fa-eye"></i>
+            </div>
+            <div class="change-password-form-group">
+              <label for="newPassword">New Password:</label>
+              <input type="password" name="newPassword" id="newPassword" required>
+              <i id="toggleNewPassword" class="fa fa-eye"></i>
+            </div>
+            <div class="change-password-button-container">
+              <button type="submit">Change Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+
+
+
+      <div id="registeradmin-section" class="content-section">
+        <div class="admin-form-container">
+          <form id="registerAdminForm" method="post" action="/registeradmin">
+            <div class="admin-form-group">
+              <input type="email" id="adminEmail" name="email"   placeholder="Admin Email" required />
+            </div>
+            <div class="admin-form-group">
+              <input type="password" id="adminPassword" name="password" placeholder="Admin Password" required />
+              <i class="fa fa-eye" id="toggleAdminPassword"></i>
+            </div>
+            <div class="admin-button-container">
+              <button type="submit">Register Admin</button>
+            </div>
+            <p id="adminMessage" class="admin-message"></p>
+          </form>
+        </div> 
+      </div>
+     
+      
+      </div>
+    </div>
+  </div>
+  <script src="/script/adminpanelscript.js"></script>
+</body>
+</html>

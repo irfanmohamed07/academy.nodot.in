@@ -70,10 +70,11 @@
       }
 
       .course-card a {
-        align-self: flex-start;
+        text-align: center;
         text-decoration: none;
+
         padding: 10px 16px;
-        background: #007bff;
+        background: #5624d0;
         color: white;
         border-radius: 6px;
         font-weight: 500;
@@ -81,7 +82,7 @@
       }
 
       .course-card a:hover {
-        background: #0056b3;
+        background: #6b3fdc;
       }
 
       p {
@@ -126,7 +127,35 @@
           <div class="course-card-content">
             <h2><%= course.name %></h2>
             <p><%= course.description %></p>
+
+            <div
+              style="
+                background: #eee;
+                height: 3px;
+                border-radius: 5px;
+                overflow: hidden;
+              "
+            >
+              <div
+                style="
+                  width: <%= course.progress %>%;
+                  height: 100%;
+                  background: #5624d0;
+                "
+              ></div>
+            </div>
+            <p style="text-align: left; font-size: 14px">
+              <%= course.progress %>% Completed
+            </p>
             <a href="/learn/<%= course.id %>">View Course</a>
+            <% if (course.progress === 100) { %>
+            <a
+              href="/certificate/<%= course.id %>"
+              target="_blank"
+              style="margin-top: 10px; background: #7f4cff"
+              >View Certificate</a
+            >
+            <% } %>
           </div>
         </div>
         <% }) %>

@@ -1,62 +1,103 @@
 <header>
   <nav class="navbar">
     <div class="logo">
-      <img src="../images/logo.jpg" alt="error loading" />
+      <img src="/images/logo.jpg" alt="Nodot Academy" />
       <span>Nodot Academy</span>
     </div>
 
     <!-- Mobile menu toggle (hamburger) -->
-    <div class="menu-toggle" id="menu-toggle">☰</div>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
 
     <!-- Desktop navigation (hidden on mobile) -->
     <div class="nav-center">
-      <a class="active" href="/"><i class="fa fa-fw fa-home"></i> Home</a>
-      <a href="#about">About</a>
-      <a href="#courses">Courses</a>
+      <a class="<%= (locals.active && active === 'home') ? 'active' : '' %>" href="/"> Home</a>
+      <a class="<%= (locals.active && active === 'courses') ? 'active' : '' %>" href="/courses">Courses</a>
+      <a class="<%= (locals.active && active === 'about') ? 'active' : '' %>" href="/aboutus">About</a>
+      <div class="nav-search">
+        <form action="/courses/search" method="GET" id="desktop-search-form">
+          <div class="search-container">
+            <input type="text" name="query" placeholder="Search for anything" aria-label="Search courses" id="desktop-search-input">
+            <button type="submit" class="search-btn">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Desktop right-side navigation with cart and profile -->
     <div class="nav-right">
       <% if (locals.user) { %>
       <a href="/cart" class="icon-cart" title="Cart">
-        <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
+        <i class="bi bi-cart"></i>
+        <% if (locals.cartItems && cartItems > 0) { %>
+        <span class="cart-count"><%= cartItems %></span>
+        <% } %>
       </a>
       <a href="/mylearning" class="my-learning-link">My Learning</a>
-      <a href="/profile" id="user-profile-link" title="Profile">
+      <a href="#" id="user-profile-link" title="Profile">
         <div class="user-initial">
           <%= user.name ? user.name.charAt(0).toUpperCase() : "U" %>
         </div>
       </a>
+      <div id="profile-dropdown" class="dropdown hidden">
+        <ul>
+          <li><a href="/profile">My Profile</a></li>
+          <li><a href="/mylearning">My Courses</a></li>
+          <li><a href="/purchase-history">Purchase History</a></li>
+          <li>
+            <form id="logout-form" action="/logout" method="POST">
+              <button type="submit" class="logout-btn">Logout</button>
+            </form>
+          </li>
+        </ul>
+      </div>
       <% } else { %>
       <a href="/cart" class="icon-cart" title="Cart">
-        <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
+        <i class="bi bi-cart"></i>
       </a>
-      <a class="nav-center" href="/login">
-        <i class="fa fa-fw fa-user"></i> Login
-      </a>
-      <a class="nav-center" href="/signup">Sign Up</a>
+      <a href="/login" class="login-link"> Login </a>
+      <a class="signup" href="/signup">Sign Up</a>
       <% } %>
     </div>
 
     <!-- Mobile dropdown menu (hidden by default) -->
     <div class="mobile-menu" id="mobile-menu">
-      <a class="active" href="/"><i class="fa fa-fw fa-home"></i> Home</a>
-      <a href="#about">About</a>
-      <a href="#courses">Courses</a>
+      <div class="mobile-search">
+        <form action="/courses/search" method="GET" id="mobile-search-form">
+          <div class="search-container">
+            <input type="text" name="query" placeholder="Search for anything" aria-label="Search courses" id="mobile-search-input">
+            <button type="submit" class="search-btn">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <a class="<%= (locals.active && active === 'home') ? 'active' : '' %>" href="/"> Home</a>
+      <a class="<%= (locals.active && active === 'courses') ? 'active' : '' %>" href="/courses">Courses</a>
+      <a class="<%= (locals.active && active === 'about') ? 'active' : '' %>" href="/aboutus">About</a>
       <a href="/cart" class="icon-cart" title="Cart">
-        <i class="bi bi-cart" style="font-size: 20px; color: rgb(0, 0, 0)"></i>
+        <i class="bi bi-cart"></i>
+        <% if (locals.user && locals.cartItems && cartItems > 0) { %>
+        <span class="cart-count"><%= cartItems %></span>
+        <% } %>
       </a>
       <% if (locals.user) { %>
       <a href="/mylearning">My Learning</a>
-      <a href="/profile" id="user-profile-link" title="Profile">
-        <div class="user-initial">
-          <%= user.name ? user.name.charAt(0).toUpperCase() : "U" %>
-        </div>
-      </a>
+      <a href="/profile">My Profile</a>
+      <form id="mobile-logout-form" action="/logout" method="POST">
+        <button type="submit" class="logout-btn">Logout</button>
+      </form>
       <% } else { %>
       <a href="/login">Login</a>
-      <a href="/signup">Sign Up</a>
+      <a class="signup" href="/signup">Sign Up</a>
       <% } %>
     </div>
   </nav>
+
+  <% if (user) { %>
+  <script src="/script/profileScript.js"></script>
+  <% } %>
+  <script src="/script/search.js"></script>
+  <script src="/script/menuToggle.js"></script>
 </header>

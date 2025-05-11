@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase History | Nodot Academy</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .purchase-container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+      width: 92%;
+    }
+    
+    .purchase-header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .purchase-header h1 {
+      font-size: 1.8rem;
+      margin: 0 0 10px;
+      color: #1c1d1f;
+    }
+    
+    .purchase-header p {
+      font-size: 1rem;
+      color: #6a6f73;
+      margin: 0;
+    }
+    
+    .purchase-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .purchase-table th {
+      background-color: #f7f9fa;
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1c1d1f;
+      border-bottom: 1px solid #e8e9eb;
+    }
+    
+    .purchase-table td {
+      padding: 15px;
+      border-bottom: 1px solid #e8e9eb;
+      font-size: 0.95rem;
+      color: #1c1d1f;
+    }
+    
+    .purchase-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .purchase-table tr:hover {
+      background-color: #f7f9fa;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 20px;
+    }
+    
+    .status-success {
+      background-color: #ecf8f3;
+      color: #3cb371;
+    }
+    
+    .status-failed {
+      background-color: #fceef0;
+      color: #d63031;
+    }
+    
+    .no-purchases {
+      text-align: center;
+      padding: 40px 0;
+    }
+    
+    .no-purchases i {
+      font-size: 3rem;
+      color: #6a6f73;
+      margin-bottom: 20px;
+      display: block;
+    }
+    
+    .no-purchases p {
+      font-size: 1.1rem;
+      color: #1c1d1f;
+      margin-bottom: 20px;
+    }
+    
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .action-btn {
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+      margin: 0 10px;
+    }
+    
+    .primary-btn {
+      background: #5624d0;
+      color: white;
+      border: none;
+    }
+    
+    .primary-btn:hover {
+      background: #401b9c;
+    }
+    
+    /* Card view for mobile */
+    .purchase-cards {
+      display: none;
+    }
+    
+    .purchase-card {
+      background: white;
+      border: 1px solid #e8e9eb;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .purchase-card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f1f1;
+    }
+    
+    .purchase-card-row:last-child {
+      border-bottom: none;
+    }
+    
+    .purchase-card-label {
+      font-weight: 600;
+      color: #6a6f73;
+      font-size: 0.85rem;
+    }
+    
+    .purchase-card-value {
+      color: #1c1d1f;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    
+    @media (max-width: 768px) {
+      .purchase-container {
+        padding: 20px;
+      }
+      
+      .purchase-table {
+        display: block;
+        overflow-x: auto;
+      }
+      
+      .purchase-table th, 
+      .purchase-table td {
+        padding: 10px;
+      }
+      
+      .action-btn {
+        margin: 5px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .purchase-container {
+        padding: 15px;
+        margin: 10px auto;
+      }
+      
+      .purchase-header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .purchase-header p {
+        font-size: 0.9rem;
+      }
+      
+      .purchase-table {
+        display: none;
+      }
+      
+      .purchase-cards {
+        display: block;
+      }
+      
+      .action-btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        margin: 0 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+  
+  <div class="purchase-container">
+    <div class="purchase-header">
+      <h1>Purchase History</h1>
+      <p>View all your course purchases and payment details</p>
+    </div>
+    
+    <% if (purchases && purchases.length > 0) { %>
+      <!-- Table view for larger screens -->
+      <table class="purchase-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Order ID</th>
+            <th>Course</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% purchases.forEach(purchase => { %>
+            <tr>
+              <td>
+                <% if (purchase.payment_date) { %>
+                  <%= new Date(purchase.payment_date).toLocaleDateString() %>
+                <% } else if (purchase.purchased_at) { %>
+                  <%= new Date(purchase.purchased_at).toLocaleDateString() %>
+                <% } else { %>
+                  Unknown date
+                <% } %>
+              </td>
+              <td><%= purchase.order_id || purchase.id || "N/A" %></td>
+              <td><%= purchase.course_name || "Unknown course" %></td>
+              <td>₹<%= purchase.amount || purchase.price || 0 %></td>
+              <td>
+                <span class="status-badge <%= purchase.status === 'success' || purchase.status === undefined ? 'status-success' : 'status-failed' %>">
+                  <%= purchase.status === 'success' || purchase.status === undefined ? 'Successful' : 'Failed' %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      
+      <!-- Card view for mobile screens -->
+      <div class="purchase-cards">
+        <% purchases.forEach(purchase => { %>
+          <div class="purchase-card">
+            <div class="purchase-card-row">
+              <div class="purchase-card-label">Date</div>
+              <div class="purchase-card-value">
+                <% if (purchase.payment_date) { %>
+                  <%= new Date(purchase.payment_date).toLocaleDateString() %>
+                <% } else if (purchase.purchased_at) { %>
+                  <%= new Date(purchase.purchased_at).toLocaleDateString() %>
+                <% } else { %>
+                  Unknown date
+                <% } %>
+              </div>
+            </div>
+            <div class="purchase-card-row">
+              <div class="purchase-card-label">Course</div>
+              <div class="purchase-card-value"><%= purchase.course_name || "Unknown course" %></div>
+            </div>
+            <div class="purchase-card-row">
+              <div class="purchase-card-label">Amount</div>
+              <div class="purchase-card-value">₹<%= purchase.amount || purchase.price || 0 %></div>
+            </div>
+            <div class="purchase-card-row">
+              <div class="purchase-card-label">Status</div>
+              <div class="purchase-card-value">
+                <span class="status-badge <%= purchase.status === 'success' || purchase.status === undefined ? 'status-success' : 'status-failed' %>">
+                  <%= purchase.status === 'success' || purchase.status === undefined ? 'Successful' : 'Failed' %>
+                </span>
+              </div>
+            </div>
+            <div class="purchase-card-row">
+              <div class="purchase-card-label">Order ID</div>
+              <div class="purchase-card-value" style="word-break: break-all;"><%= purchase.order_id || purchase.id || "N/A" %></div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="no-purchases">
+        <i class="bi bi-receipt"></i>
+        <p>You haven't made any purchases yet</p>
+        <a href="/courses" class="action-btn primary-btn">Browse Courses</a>
+      </div>
+    <% } %>
+    
+    <div class="action-buttons">
+      <a href="/profile" class="action-btn primary-btn">Back to Profile</a>
+      <a href="/mylearning" class="action-btn primary-btn">My Learning</a>
+    </div>
+  </div>
+  
+  <%- include('partials/footer') %>
+</body>
+</html> 

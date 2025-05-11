@@ -3,53 +3,175 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Nodot Academy</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>Nodot Academy - Learn Skills for Today, Tomorrow, and Beyond</title>
+    <meta name="description" content="Expand your potential with career-focused courses and real-world internship opportunities at Nodot Academy. Quality education at affordable prices." />
+    <meta name="keywords" content="online courses, e-learning, web development, data science, mobile app development, UI/UX design, coding, programming, internship" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://academy.nodot.in/" />
+    <meta property="og:title" content="Nodot Academy - Learn Skills for Today, Tomorrow, and Beyond" />
+    <meta property="og:description" content="Expand your potential with career-focused courses and real-world internship opportunities at Nodot Academy." />
+    <meta property="og:image" content="/images/logo.jpg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://academy.nodot.in/" />
+    <meta property="twitter:title" content="Nodot Academy - Learn Skills for Today, Tomorrow, and Beyond" />
+    <meta property="twitter:description" content="Expand your potential with career-focused courses and real-world internship opportunities at Nodot Academy." />
+    <meta property="twitter:image" content="/images/logo.jpg" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://academy.nodot.in/" />
+    
     <link rel="stylesheet" href="/css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
     />
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "Nodot Academy",
+        "url": "https://academy.nodot.in",
+        "logo": "https://academy.nodot.in/images/logo.jpg",
+        "description": "Expand your potential with career-focused courses and real-world internship opportunities at Nodot Academy.",
+        "sameAs": [
+          "https://facebook.com/nodotacademy",
+          "https://twitter.com/nodotacademy",
+          "https://instagram.com/nodotacademy"
+        ]
+      }
+    </script>
   </head>
   <body>
     <%- include('partials/header') -%>
 
     <section class="hero">
       <div class="hero-content">
-        <h1>Learn. Build. Grow.</h1>
+        <h1>Learn skills for today, tomorrow, and beyond</h1>
         <p>
-          Welcome to Nodot Academy — Empowering future innovators through
-          quality learning and real-world internships.
+          Expand your potential with our career-focused courses and real-world internship opportunities.
         </p>
-        <a href="/courses" class="cta-button">Explore Courses</a>
+        <div class="hero-actions">
+          <a href="/courses" class="cta-button">Explore Courses</a>
+        </div>
       </div>
     </section>
 
     <section class="highlights">
-      <div class="highlight">💸 Affordable</div>
-      <div class="highlight">🧠 Practical Learning</div>
-      <div class="highlight">📜 Certificate + Internship</div>
+      <div class="highlight">
+        <i class="bi bi-wallet2"></i>
+        <span>Affordable Learning</span>
+        <p>Quality education at budget-friendly prices</p>
+      </div>
+      <div class="highlight">
+        <i class="bi bi-lightbulb"></i>
+        <span>Industry-Relevant Skills</span>
+        <p>Learn what employers are looking for today</p>
+      </div>
+      <div class="highlight">
+        <i class="bi bi-award"></i>
+        <span>Certificate + Internship</span>
+        <p>Gain credentials and practical experience</p>
+      </div>
     </section>
 
     <section class="courses" id="courses">
       <h2>Popular Courses</h2>
+      <p class="subtitle">Expand your career opportunities with our high-demand courses</p>
       <div class="course-grid">
         <% courses.forEach(course => { %>
         <div class="course-card">
           <img src="<%= course.image_url %>" alt="<%= course.name %>" />
-          <h3><%= course.name %></h3>
-          <p><%= course.description %></p>
-          <span>₹<%= course.price %></span>
-          <p>
-            <a href="/course/<%= course.id %>">
-              <button class="cta-button">More Details</button>
-            </a>
-          </p>
+          <div class="course-card-content">
+            <h3><%= course.name %></h3>
+            <div class="rating">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-half"></i>
+              <span>4.5 (125)</span>
+            </div>
+            <p><%= course.description %></p>
+            <div class="price">₹<%= course.price %></div>
+            <a href="/course/<%= course.id %>" class="cta-button">View Course</a>
+          </div>
         </div>
         <% }) %>
+      </div>
+      <div class="view-all-courses">
+        <a href="/courses" class="cta-button">View All Courses</a>
+      </div>
+    </section>
+
+    <section class="categories">
+      <h2>Top Categories</h2>
+      <div class="category-grid">
+        <a href="/courses?category=web-development" class="category-card">
+          <i class="bi bi-code-slash"></i>
+          <h3>Web Development</h3>
+        </a>
+        <a href="/courses?category=data-science" class="category-card">
+          <i class="bi bi-bar-chart"></i>
+          <h3>Data Science</h3>
+        </a>
+        <a href="/courses?category=mobile-app" class="category-card">
+          <i class="bi bi-phone"></i>
+          <h3>Mobile App Development</h3>
+        </a>
+        <a href="/courses?category=design" class="category-card">
+          <i class="bi bi-brush"></i>
+          <h3>UI/UX Design</h3>
+        </a>
+      </div>
+    </section>
+
+    <section class="testimonials">
+      <h2>What Our Students Say</h2>
+      <div class="testimonial-slider">
+        <div class="testimonial">
+          <div class="testimonial-content">
+            <p>"The internship opportunity after completing my course was invaluable. I learned practical skills that helped me land my first tech job."</p>
+            <div class="testimonial-author">
+              <img src="/images/avatar-placeholder.jpg" alt="Student" />
+              <div>
+                <h4>Priya Sharma</h4>
+                <p>Web Development Graduate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2>Start your learning journey today</h2>
+        <p>Join thousands of students already learning on Nodot Academy</p>
+        <a href="/courses" class="cta-button">Explore Now</a>
       </div>
     </section>
 
     <%- include('partials/footer') -%>
+    <script>
+      // Add simple slider functionality for testimonials
+      document.addEventListener('DOMContentLoaded', function() {
+        // You can expand this for a real slider if needed
+      });
+    </script>
   </body>
 </html>

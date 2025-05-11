@@ -1,0 +1,126 @@
+<!-- 
+  SEO TEMPLATE FOR NODOT ACADEMY
+  
+  Instructions: Copy the relevant sections below into each page's head section.
+  Replace variables in {{brackets}} with actual content specific to that page.
+-->
+
+<!-- Basic SEO Meta Tags -->
+<title>{{Page Title}} | Nodot Academy</title>
+<meta name="description" content="{{Page description - keep between 150-160 characters}}" />
+<meta name="keywords" content="{{comma-separated keywords relevant to the page}}" />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://academy.nodot.in/{{page-url}}" />
+<meta property="og:title" content="{{Page Title}} | Nodot Academy" />
+<meta property="og:description" content="{{Short description - keep under 100 characters}}" />
+<meta property="og:image" content="/images/{{relevant-image.jpg}}" />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content="https://academy.nodot.in/{{page-url}}" />
+<meta property="twitter:title" content="{{Page Title}} | Nodot Academy" />
+<meta property="twitter:description" content="{{Short description - keep under 100 characters}}" />
+<meta property="twitter:image" content="/images/{{relevant-image.jpg}}" />
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+<link rel="manifest" href="/favicon/site.webmanifest" />
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://academy.nodot.in/{{page-url}}" />
+
+<!-- STRUCTURED DATA TEMPLATES -->
+
+<!-- For Course Page -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "{{course.name}}",
+    "description": "{{course.description}}",
+    "provider": {
+      "@type": "Organization",
+      "name": "Nodot Academy",
+      "sameAs": "https://academy.nodot.in"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "{{course.price}}",
+      "priceCurrency": "INR"
+    },
+    "inLanguage": "{{course.language}}",
+    "timeRequired": "{{course.duration}}",
+    "image": "{{course.image_url}}",
+    "instructor": {
+      "@type": "Person",
+      "name": "{{course.instructor}}"
+    }
+  }
+</script>
+
+<!-- For Course List Page -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+      <!-- Repeat this block for each course -->
+      {
+        "@type": "ListItem",
+        "position": {{index}},
+        "item": {
+          "@type": "Course",
+          "name": "{{course.name}}",
+          "description": "{{course.description}}",
+          "provider": {
+            "@type": "Organization",
+            "name": "Nodot Academy",
+            "sameAs": "https://academy.nodot.in"
+          },
+          "url": "https://academy.nodot.in/course/{{course.id}}"
+        }
+      }
+      <!-- End repeat block -->
+    ]
+  }
+</script>
+
+<!-- For Organization (About Page) -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "Nodot Academy",
+    "alternateName": "Nodot",
+    "url": "https://academy.nodot.in",
+    "logo": "https://academy.nodot.in/images/about-logo.png",
+    "description": "Nodot Academy is an MSME-registered e-learning platform that bridges the gap between education and industry.",
+    "sameAs": [
+      "https://facebook.com/nodotacademy",
+      "https://twitter.com/nodotacademy",
+      "https://instagram.com/nodot.in", 
+      "https://linkedin.com/in/no-dot-a666b535a"
+    ]
+  }
+</script>
+
+<!-- For Profile/Contact Pages (no indexing) -->
+<meta name="robots" content="noindex, follow" />
+
+<!-- SEO BEST PRACTICES -->
+<!--
+1. Use h1 tag for main headings (only one per page)
+2. Use meaningful alt text for images: 
+   <img src="path" alt="Descriptive text about what the image shows - include keywords naturally" />
+3. Use semantic HTML elements (section, article, nav, etc.)
+4. Keep URLs short and descriptive 
+5. Ensure mobile responsiveness
+6. Keep page load times fast
+7. Use internal linking with descriptive anchor text
+8. Update content regularly
+--> 

@@ -18,6 +18,7 @@ router.get("/", async (req, res) => {
 
 router.get("/course/:id", async (req, res) => {
   const courseId = req.params.id;
+  const userEmail = req.session.email;
 
   const courseQuery = await pool.query("SELECT * FROM courses WHERE id = $1", [
     courseId,
@@ -39,10 +40,22 @@ router.get("/course/:id", async (req, res) => {
     })
   );
 
+  let hasPurchased = false;
+
+  if (userEmail) {
+    const purchaseCheck = await pool.query(
+      "SELECT * FROM purchases WHERE email = $1 AND course_id = $2",
+      [userEmail, courseId]
+    );
+    hasPurchased = purchaseCheck.rows.length > 0;
+  }
+
   res.render("course-details", {
     course,
     sections,
     user: req.session.user || null,
+    userEmail,
+    hasPurchased,
   });
 });
 
@@ -52,18 +65,40 @@ router.get("/mylearning", async (req, res) => {
   }
 
   try {
-    const userId = req.session.user.id;
+    const email = req.session.user.email;
+
     const result = await pool.query(
-      `SELECT courses.* 
-       FROM purchases 
-       JOIN courses ON purchases.course_id = courses.id 
-       WHERE purchases.email = $1`,
-      [req.session.user.email]
+      `
+      SELECT 
+        c.*, 
+        COUNT(DISTINCT m.id) AS total_modules,
+        COUNT(DISTINCT vp.module_id) AS completed_modules
+      FROM purchases p
+      JOIN courses c ON p.course_id = c.id
+      LEFT JOIN sections s ON s.course_id = c.id
+      LEFT JOIN modules m ON m.section_id = s.id
+      LEFT JOIN video_progress vp 
+        ON vp.module_id = m.id AND vp.email = $1 AND vp.watched = true
+      WHERE p.email = $1
+      GROUP BY c.id
+      `,
+      [email]
     );
+
+    const courses = result.rows.map((course) => {
+      const progress =
+        course.total_modules > 0
+          ? Math.round((course.completed_modules / course.total_modules) * 100)
+          : 0;
+      return {
+        ...course,
+        progress,
+      };
+    });
 
     res.render("mylearning", {
       user: req.session.user,
-      courses: result.rows,
+      courses,
     });
   } catch (err) {
     console.error("Error loading my learning:", err);

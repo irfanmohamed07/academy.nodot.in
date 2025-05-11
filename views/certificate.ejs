@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Certificate</title>
+    <link rel="stylesheet" href="/css/certificate.css" />
+  </head>
+  <body>
+    <!-- Action Buttons -->
+    <div class="btns">
+      <button onclick="window.print()">Print</button>
+      <button onclick="downloadPDF()">Download PDF</button>
+    </div>
+
+    <!-- Certificate -->
+    <div class="certificate" id="certificate">
+      <h1>Certificate of Completion</h1>
+      <p>This is to certify that</p>
+      <div class="name"><%= name %></div>
+      <p>has successfully completed the course</p>
+      <h2>"<%= courseName %>"</h2>
+      <p>on <%= date %></p>
+
+      <div class="code">
+        <p>
+          Signature:
+          <img
+            src="/images/signature.jpg"
+            alt="Digital Signature"
+            style="max-height: 30px; width: 130px; margin-top: 5px"
+          />
+        </p>
+
+        Certificate ID: <strong><%= code %></strong><br />
+        academy.nodot.in/verify<%= code %>
+        <br />
+        Issued By: nodot academy
+      </div>
+    </div>
+
+    <!-- Load required libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+      async function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const element = document.getElementById("certificate");
+
+        // Temporarily clone the certificate to apply desktop dimensions
+        const clone = element.cloneNode(true);
+        clone.style.width = "794px";
+        clone.style.height = "500px";
+        clone.style.padding = "40px";
+        clone.style.position = "fixed";
+        clone.style.left = "-9999px"; // Hide it off-screen
+
+        document.body.appendChild(clone); // Add it to DOM (hidden)
+
+        // Capture image from the cloned desktop-style element
+        const canvas = await html2canvas(clone, { scale: 2 });
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+
+        const pdf = new jsPDF({
+          orientation: "landscape",
+          unit: "pt",
+          format: [canvas.width, canvas.height],
+        });
+
+        pdf.addImage(imgData, "JPEG", 0, 0, canvas.width, canvas.height);
+        pdf.save("certificate.pdf");
+
+        // Clean up the cloned element
+        document.body.removeChild(clone);
+      }
+    </script>
+  </body>
+</html>

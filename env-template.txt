@@ -1,0 +1,54 @@
+PRIVATE_KEY="-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCWP1MPNuz5dSTw
+gcmjiuIqbNpmXRCLeTNJXYXVxCfayrgiirJZrHnluiVfZpJUG0bofil9R0BhL3ho
+xyAKsIdj5/LODKCgCaqy/2hKsicjo13hTANeU5jaynpnghzGtsfnFwzZMSNTDzSt
+uR0ebI0xsniwVZlUAqSRw1gO2jIdudpFIB2SElcyUrgbAVCMCeYmdPdNGMIhjm6A
+hB0qDyLli+JIPacqgJlu3itCmjLQKMwsOGWIdG0U9+TMCTn47wyrrZr6SA9TPBoU
+B/dXnax9r+9IBWVsJbbwzu8Q1PmlPO4g8/2ULFY1q2o0MHxCKS9u11I1hwtQ4/iB
+saw4mwQ7AgMBAAECggEARx/TAfDOXYjG49OM0I5+YfcFrE+B9YR6ctCC+p7Q/xHX
++QIPS8QKMGXeKzszKf1/o6+VlGiWYWtHZNJeqLDIZtL2bfQsVZY96F5f0Hxlasl7
+N5v0PEL2qRwQtc8yMB92oj6XJnnMbxVTqqlmz3AzpsMFvvPGka5umVIP7Xf9IXSP
+33XJUNTBOeS3PgwA77KZopYojwTHxznHUJBbvqthJ1mYujmVTeHCh/n6CqSh/TUQ
+j/rOgyEu3OZc5Z1vMdp6f87hRYKED/NQVYcuvNOuVzvcotuP3zVehTFS2kq6bA8h
+s7yplB83GDG/MSOCdpErGymhjLMGCuHAYhjWPu8WgQKBgQDFR25EEOFqmqJqrx6j
+zn8LYWxLcexWY1JCrH0BoKsPZ0xNtghaQFuzptHpRxy+EaFfbHJkz0/zvtmFg8LF
+i4QxNiJEg2GXiEu7OoiUo748rxPO4emHFp4gNTRO+3zjwMF5czHOokJfsoF6eEnS
+WldehLbVuLtTt1/xaHOK7xrKhQKBgQDC+BpXqu1xBs5lKdhik6kkyz2ndN/r15JD
+xZLSiKwIP5Q1evPRrAiCJyLRU0yAer20y0xJWuC6TzXKyQxSxDYTniGTSudx9pQ2
+o/b3drlz8R3ggim1cu2qDbnZa1BBzSqsgJ5tH4XLR0hfqz5MvlVNDM+Uumogcj1M
+6LZ4OomvvwKBgG+fvTpyOrmxCVlIARQ6kRQFads+eLVguXjUVF8JZADxN/F4oD1A
+0SJTr85I2HCLVT3DBO8ZhmmqgTXUme5gxMl7keQmWp/9FKy5r/I6vDdl8NVManBv
+UcVzlUdjcQUFWfO4RGRg1yGCxVRgn5SQXYMzoKhJQGVcCsNzkHz6UbRpAoGAZlsm
+STwdJ6dxF78eMLJgrEZe+djr7b7gtN+2svy5hCMMxf7kngD4/otZRhe7JABMM+w/
+AovJS0ZmcS2XYKRN14K/EbrTQws2yHDQKR6VQf8ltkXfa7kIeKx4E2K5YbI6YxGr
+GpLgBNZJcqBONq/9zFObbvNm393ZvNS3ZuskebUCgYEAmMtExNqXUYLj21Yi3fR5
+bU2DmfM4cat9CdjbkycgFbQZOkqM2V2cVfOFAbT9jE956KJMwdeAqk1ymRDD6SgB
+ur/rKbcJYzLs8AHUDqEj1uHalTG+kfd3NGYJ2F8G0/qzTVAqtdFaeLGNHbv6o/TD
+vviYmapSg+vDdEBTQH37lt4=
+-----END PRIVATE KEY-----"
+
+# Add your CloudFront key pair ID here
+# CLOUDFRONT_KEY_PAIR_ID=
+
+# Database configuration
+# DB_USER=
+# DB_HOST=
+# DB_NAME=
+# DB_PASSWORD=
+# DB_PORT=
+
+# Razorpay credentials
+# RAZORPAY_KEY_ID=
+# RAZORPAY_KEY_SECRET=
+
+# Email configuration
+# MAIL_PASS=
+
+# Video Security Settings
+VIDEO_SECURITY_KEY=replace_with_random_32_or_more_character_string
+VIDEO_MAX_AGE_SECONDS=900  # 15 minutes expiration for secure URLs
+
+# Cloudinary Configuration (for video hosting)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret 

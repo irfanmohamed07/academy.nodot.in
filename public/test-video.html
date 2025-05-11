@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Test Page</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { color: #333; }
+    video { max-width: 100%; height: auto; border: 1px solid #ddd; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .error { color: red; font-weight: bold; }
+    .success { color: green; font-weight: bold; }
+    pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input[type="text"] { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { padding: 8px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+    .debug-info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px; }
+    #error-display { color: red; margin-top: 10px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Direct Video Test</h2>
+    
+    <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+      <h3>Test a Different Video Path</h3>
+      <div class="form-group">
+        <label for="videoPath">Video Path (without domain):</label>
+        <input type="text" id="videoPath" placeholder="e.g., videos/course1/intro.mp4">
+      </div>
+      <button onclick="loadVideo()">Test Video</button>
+      <button onclick="openInNewTab()" style="background: #2196F3; margin-left: 10px;">Open in New Tab</button>
+    </div>
+    
+    <h3>Current Video:</h3>
+    <p>Path: <code id="current-path">No path entered yet</code></p>
+    
+    <div style="margin: 20px 0;">
+      <video id="videoPlayer" controls width="640" style="max-width: 100%;">
+        <source id="videoSource" src="" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div id="error-display"></div>
+    </div>
+    
+    <div class="debug-info">
+      <h3>Debug Info:</h3>
+      <p>CloudFront Domain: <code>d3kpn8l37jcfni.cloudfront.net</code></p>
+      <p>Try these options if video doesn't play:</p>
+      <ol>
+        <li>Make sure the path is correct and the file exists</li>
+        <li>Try a different video path</li>
+        <li>Check if CORS is enabled on your CloudFront distribution</li>
+        <li>Your distribution might require signed URLs. Consider configuring CloudFront without requiring signed URLs temporarily.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    // Function to load video and handle errors
+    function loadVideo() {
+      const videoPath = document.getElementById('videoPath').value.trim();
+      const videoPlayer = document.getElementById('videoPlayer');
+      const videoSource = document.getElementById('videoSource');
+      const errorDisplay = document.getElementById('error-display');
+      
+      // Update displayed path
+      document.getElementById('current-path').textContent = videoPath;
+      
+      // Reset error display
+      errorDisplay.style.display = 'none';
+      errorDisplay.textContent = '';
+      
+      // If no path entered
+      if (!videoPath) {
+        errorDisplay.textContent = 'Please enter a video path';
+        errorDisplay.style.display = 'block';
+        return;
+      }
+      
+      // Generate the video URL
+      const finalUrl = createVideoUrl(videoPath);
+      
+      // Set the video source
+      videoSource.src = finalUrl;
+      
+      // Load the video
+      videoPlayer.load();
+      
+      // Handle video errors
+      videoPlayer.onerror = function() {
+        let errorMessage = "Unknown video error";
+        
+        switch(videoPlayer.error.code) {
+          case 1:
+            errorMessage = "Video loading aborted";
+            break;
+          case 2:
+            errorMessage = "Network error - check if the video exists and CORS is enabled";
+            break;
+          case 3:
+            errorMessage = "Video decoding failed - the file might be corrupted";
+            break;
+          case 4:
+            errorMessage = "Video not supported or not found";
+            break;
+        }
+        
+        errorDisplay.textContent = `Error: ${errorMessage} (Code: ${videoPlayer.error.code})`;
+        errorDisplay.style.display = 'block';
+      };
+      
+      // Log success when video can play
+      videoPlayer.oncanplay = function() {
+        console.log("Video loaded successfully");
+      };
+    }
+
+    // Add this function for creating video URLs
+    function createVideoUrl(path) {
+      if (path.startsWith('http')) {
+        return path;
+      }
+      
+      // Remove leading slash if present
+      const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      
+      // URL encode the path but preserve slashes
+      const encodedPath = encodeURIComponent(normalizedPath).replace(/%2F/g, '/');
+      
+      // Return the full CloudFront URL
+      return `https://d3kpn8l37jcfni.cloudfront.net/${encodedPath}`;
+    }
+
+    // Add this function to open in a new tab
+    function openInNewTab() {
+      const videoPath = document.getElementById('videoPath').value.trim();
+      
+      if (!videoPath) {
+        alert('Please enter a video path first');
+        return;
+      }
+      
+      const url = createVideoUrl(videoPath);
+      window.open(url, '_blank');
+    }
+  </script>
+</body>
+</html> 

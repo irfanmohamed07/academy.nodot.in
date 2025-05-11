@@ -1,0 +1,294 @@
+/* Main layout */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: #1c1d1f;
+  margin: 0;
+  padding: 0;
+  background-color: #f7f9fa;
+}
+
+/* Top container */
+.top-container {
+  display: flex;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('/images/background.jpg') no-repeat center/cover;
+  padding: 60px 5%;
+  color: white;
+  position: relative;
+  min-height: 300px;
+}
+
+.top-left {
+  flex: 2;
+  padding-right: 30px;
+  max-width: 60%;
+}
+
+.top-left h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.top-left p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.course-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+}
+
+.meta-item i {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.top-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.info-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+  max-width: 350px;
+  color: #1c1d1f;
+}
+
+.course-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.course-includes {
+  margin: 20px 0;
+}
+
+.includes-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.includes-item i {
+  margin-right: 10px;
+  color: #5624d0;
+}
+
+.enroll-btn {
+  background-color: #5624d0;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 16px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.enroll-btn:hover {
+  background-color: #401b9c;
+}
+
+.go-to-course-btn {
+  text-decoration: none;
+  color: white;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Bottom section */
+.bottom-section {
+  background-color: white;
+  padding: 60px 5%;
+}
+
+.section {
+  margin-bottom: 60px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #1c1d1f;
+  position: relative;
+}
+
+.section h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #5624d0;
+}
+
+/* Accordion for course content */
+.accordion {
+  border: 1px solid #dedfe0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+details {
+  border-bottom: 1px solid #dedfe0;
+}
+
+details:last-child {
+  border-bottom: none;
+}
+
+summary {
+  padding: 16px 20px;
+  background-color: #f7f9fa;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+summary::after {
+  content: '\2b';
+  font-family: 'Bootstrap Icons';
+  font-size: 1.2rem;
+}
+
+details[open] summary::after {
+  content: '\f659';
+}
+
+details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+details li {
+  padding: 16px 20px 16px 40px;
+  border-top: 1px solid #dedfe0;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+details li::before {
+  content: '\f4f7';
+  font-family: 'Bootstrap Icons';
+  position: absolute;
+  left: 20px;
+  color: #5624d0;
+}
+
+/* Media queries */
+@media screen and (max-width: 992px) {
+  .top-container {
+    flex-direction: column;
+    padding: 40px 5%;
+  }
+  
+  .top-left {
+    max-width: 100%;
+    padding-right: 0;
+    margin-bottom: 30px;
+  }
+  
+  .top-right {
+    justify-content: center;
+  }
+  
+  .info-card {
+    max-width: 100%;
+  }
+}
+
+/* Benefits & Requirements lists */
+.benefits-list, .requirements-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.benefits-list li, .requirements-list li {
+  display: flex;
+  align-items: flex-start;
+}
+
+.benefits-list i, .requirements-list i {
+  color: #5624d0;
+  margin-right: 10px;
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+
+.benefits-list i {
+  color: #5624d0;
+}
+
+.requirements-list i {
+  color: #1c1d1f;
+}
+
+@media screen and (max-width: 768px) {
+  .benefits-list, .requirements-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Empty content */
+.empty-content {
+  padding: 30px;
+  text-align: center;
+  background-color: #f7f9fa;
+  border-radius: 4px;
+}
+
+.empty-content i {
+  font-size: 3rem;
+  color: #6a6f73;
+  margin-bottom: 15px;
+}
+
+.empty-content p {
+  font-size: 1.1rem;
+  color: #6a6f73;
+}

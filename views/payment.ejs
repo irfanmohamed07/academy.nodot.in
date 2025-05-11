@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Payment Page</title>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js"></script>
 
     <style>
       /* Reset some default styles */
@@ -111,24 +112,6 @@
         color: #28a745;
         margin-bottom: 20px;
       }
-
-      .tick-animation {
-        font-size: 60px;
-        color: #28a745;
-        animation: tick 1s ease-in-out infinite;
-      }
-
-      @keyframes tick {
-        0% {
-          transform: scale(0);
-        }
-        50% {
-          transform: scale(1.2);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
     </style>
   </head>
 
@@ -149,76 +132,90 @@
     </div>
 
     <!-- Modal for Order Success -->
+    <!-- Lottie Modal for Order Success -->
     <div id="orderSuccessModal" class="modal">
       <div class="modal-content">
-        <div class="modal-header">Order Placed Successfully!</div>
-        <div class="tick-animation">✔️</div>
+        <div class="modal-header">Payment Successful!</div>
+        <div
+          id="lottie-animation"
+          style="width: 150px; height: 150px; margin: 20px auto"
+        ></div>
         <p>
-          Your order has been successfully placed. Thank you for your purchase!
+          Your course has been successfully purchased. Thank you for enrolling
+          with us!
         </p>
-        <button onclick="window.location.href='/';">Close</button>
+        <button onclick="window.location.href='/';">Go Back to Home</button>
       </div>
     </div>
 
     <script>
-      // Initialize Razorpay Payment
-      const paymentButton = document.getElementById("pay-button");
+            // Initialize Razorpay Payment
+            const paymentButton = document.getElementById("pay-button");
 
-      paymentButton.onclick = function () {
-        const options = {
-          key: "<%= key_id %>",   // Razorpay Key ID
-          amount: <%= amount * 100 %>, // Total in paise
-          currency: "INR",
-          name: "Your Company Name",
-          description: "Order Payment",
-          image: "your_logo_url", // Optional: Add your logo
-          order_id: "<%= orderId %>", // Order ID from the backend
-          handler: function (response) {
-            // Send payment response to the backend for verification
-            const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+            paymentButton.onclick = function () {
+              const options = {
+                key: "<%= key_id %>",   // Razorpay Key ID
+                amount: <%= amount * 100 %>, // Total in paise
+                currency: "INR",
+                name: "nodot Academy",
+                description: "Course Payment",
+                image: "https://nodot.in/assets/images/logo.jpg", // Optional: Add your logo
+                order_id: "<%= orderId %>", // Order ID from the backend
+                handler: function (response) {
+                  // Send payment response to the backend for verification
+                  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
 
-            fetch("/process-payment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                payment_id: razorpay_payment_id,
-                order_id: razorpay_order_id,
-                signature: razorpay_signature,
-              }),
-            })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.status === "success") {
-                showOrderSuccessModal(); // Show success modal
-              } else {
-                alert("Payment failed!");
-              }
-            });
-          },
-          prefill: {
-            name: "Customer Name", // Optionally add the customer details
-            email: "customer@example.com", // Optionally add the email
-          },
-          theme: {
-            color: "#F37254", // Customize the button color
-          },
-        };
+                  fetch("/process-payment", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      payment_id: razorpay_payment_id,
+                      order_id: razorpay_order_id,
+                      signature: razorpay_signature,
+                      total: <%= amount %>,
+                    }),
+                  })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    if (data.status === "success") {
+                      showOrderSuccessModal(); // Show success modal
+                    } else {
+                      alert("Payment failed!");
+                    }
+                  });
+                },
+                prefill: {
+                  name: "Customer Name", // Optionally add the customer details
+                  email: "customer@example.com", // Optionally add the email
+                },
+                theme: {
+                  color: "#F37254", // Customize the button color
+                },
+              };
 
-        const rzp1 = new Razorpay(options);
-        rzp1.open();
-      };
+              const rzp1 = new Razorpay(options);
+              rzp1.open();
+            };
 
-      // Function to show success modal
-      function showOrderSuccessModal() {
+            function showOrderSuccessModal() {
         document.getElementById("orderSuccessModal").style.display = "flex";
+
+        lottie.loadAnimation({
+          container: document.getElementById("lottie-animation"),
+          renderer: "svg",
+          loop: false,
+          autoplay: true,
+          path: "/json/Animation check.json", // Replace with actual path to your animation
+        });
       }
 
-      // Function to close the modal
-      function closeModal() {
-        document.getElementById("orderSuccessModal").style.display = "none";
-      }
+
+            // Function to close the modal
+            function closeModal() {
+              document.getElementById("orderSuccessModal").style.display = "none";
+            }
     </script>
   </body>
 </html>

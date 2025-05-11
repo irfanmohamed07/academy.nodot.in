@@ -14,7 +14,6 @@
 
       .container {
         padding: 20px;
-
         margin: auto;
       }
 
@@ -40,6 +39,30 @@
         height: 400px;
         object-fit: cover;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Video loading styles */
+      .video-loading {
+        padding: 20px;
+        background-color: #f0f2f5;
+        border-radius: 8px;
+        text-align: center;
+      }
+      
+      .progress-bar {
+        width: 100%;
+        height: 12px;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+      
+      .progress-value {
+        height: 100%;
+        background-color: #5624d0;
+        border-radius: 10px;
+        transition: width 0.3s ease;
       }
 
       .content-list {
@@ -176,6 +199,59 @@
           word-wrap: break-word;
         }
       }
+
+      /* Video security styles */
+      .video-container {
+        position: relative;
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #000;
+      }
+      
+      .video-loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        z-index: 5;
+      }
+      
+      .video-error-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ff5252;
+        z-index: 5;
+      }
+      
+      .spinner {
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 5px solid #fff;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
     </style>
     <link rel="stylesheet" href="/css/style.css" />
   </head>
@@ -185,38 +261,37 @@
     <div class="container">
       <h1><%= course.name %></h1>
       <div class="course-content">
-        <div
-          id="mainVideo"
-          class="video-player"
-          controls
-          autoplay
-          controlsList="nodownload"
-        ></div>
-
-        <div class="content-list">
-          <h2 style="text-align: center">Course Contents</h2>
-          <% sections.forEach(function(section, index) { %>
-          <div class="accordion-item">
-            <button
-              class="accordion-header"
-              onclick="toggleAccordion(<%= index %>)"
-            >
-              <%= section.title %>
-              <span class="arrow" id="arrow_<%= index %>">&#9660;</span>
-            </button>
-            <div class="accordion-body" id="body_<%= index %>">
-              <% section.modules.forEach(function(module) { %>
-              <div class="module-item">
-                <input type="checkbox" id="check_<%= module.id %>" <%=
-                watchedModules.includes(module.id) ? "checked" : "" %>
-                onchange="updateProgress(<%= module.id %>, this.checked)" />
-                <button onclick="loadVideo('<%= module.video_url %>', this)">
-                  <%= module.title %> (<%= module.duration %>)
-                </button>
-              </div>
-              <% }); %>
-            </div>
+        <div class="video-player">
+          <div class="video-container" id="video-container">
+            <video id="currentVideo" controls width="100%" controlsList="nodownload noremoteplayback" disablePictureInPicture disableRemotePlayback>
+              <source src="" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
           </div>
+          <h2 id="current-module-title">Select a module to begin</h2>
+          <div id="module-description"></div>
+        </div>
+        <div class="content-list">
+          <% sections.forEach(function(section, sectionIndex) { %>
+            <div class="accordion-item">
+              <button class="accordion-header">
+                <%= section.title %>
+                <span class="arrow">&#9660;</span>
+              </button>
+              <div class="accordion-body">
+                <% section.modules.forEach(function(module) { %>
+                  <div class="module-item" id="module-<%= module.id %>" 
+                       data-security-id="<%= module.securityId %>"
+                       data-module-id="<%= module.id %>"
+                       data-title="<%= module.title %>"
+                       data-description="<%= module.description || '' %>">
+                    <button onclick="playModule(event, '<%= module.securityId %>', <%= module.id %>)">
+                      <%= module.title %> (<%= module.duration %> min)
+                    </button>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
           <% }); %>
         </div>
       </div>
@@ -224,42 +299,382 @@
 
     <%- include('partials/footer') -%>
 
+    <!-- Include the secure video script generated by the server -->
+    <%- secureVideoScript %>
+
     <script>
+      // Optional service worker registration - only if needed and with proper error handling
+      try {
+        if ('serviceWorker' in navigator && false) { // Set to false to disable service worker temporarily
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/js/videoProtection.js', {
+              scope: '/js/'
+            }).then(registration => {
+              console.log('Video protection service worker registered:', registration.scope);
+            }).catch(error => {
+              console.error('Service worker registration failed:', error);
+              // Continue without service worker
+            });
+          });
+        }
+      } catch (e) {
+        console.error("Error setting up service worker:", e);
+        // Continue without service worker
+      }
+
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
+
       const email = "<%= user.email %>";
+      const sessionToken = "<%= sessionToken %>"; 
+      const pageLoadTimestamp = Date.now(); // Add unique page load timestamp
+      const courseId = "<%= course.id %>"; // Get course ID for validation
+      
+      <% if (typeof videoAccessToken !== 'undefined') { %>
+      // Video access token from server
+      const videoToken = {
+        token: "<%= videoAccessToken.token %>",
+        expires: <%= videoAccessToken.expires %>
+      };
+      <% } else { %>
+      // Fallback token (empty)
+      const videoToken = {
+        token: "",
+        expires: 0
+      };
+      <% } %>
+      
+      // Safely get domain variables with hardcoded fallbacks
+      let allowedDomainsList = [
+        "academy.nodot.in", 
+        "localhost:4000"
+      ];
+      
+      <% if (typeof userDomain !== 'undefined') { %>
+      // If userDomain is defined in the template, use it
+      const userDomain = "<%= userDomain %>";
+      <% } else { %>
+      // Otherwise use a default value
+      const userDomain = "academy.nodot.in";
+      <% } %>
+      
+      // Generate a unique page token that combines session and timestamp
+      const uniquePageToken = `${sessionToken}-${pageLoadTimestamp}`;
+      
+      // Store all security tokens in sessionStorage
+      sessionStorage.setItem("sessionToken", sessionToken);
+      sessionStorage.setItem("pageLoadTimestamp", pageLoadTimestamp);
+      sessionStorage.setItem("uniquePageToken", uniquePageToken);
+      sessionStorage.setItem("courseId", courseId);
+      sessionStorage.setItem("videoToken", JSON.stringify(videoToken));
+      
+      // Check if we're on the allowed domain
+      function checkDomain() {
+        const currentDomain = window.location.hostname;
+        
+        // Check if current domain is in allowed domains list
+        const isAllowed = 
+          currentDomain === "academy.nodot.in" || 
+          currentDomain === "localhost" || 
+          currentDomain.includes("localhost:4000");
+        
+        if (!isAllowed) {
+          console.error("Domain not allowed:", currentDomain);
+          document.body.innerHTML = "<h1>Access Denied</h1><p>Videos can only be watched on our official domains.</p>";
+          return false;
+        }
+        
+        return true;
+      }
 
       let currentVideoElement = null;
       let currentVideoUrl = "";
       let progressChecked = false;
+      
+      // Function to validate if the token in the URL is still valid
+      function isVideoTokenValid(url) {
+        try {
+          // For localhost development, bypass token validation
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log("Development mode - bypassing token validation");
+            return true;
+          }
+          
+          // Extract token parameters from URL
+          const urlObj = new URL(url);
+          const urlToken = urlObj.searchParams.get('token');
+          const urlExpires = urlObj.searchParams.get('expires');
+          const urlCourseId = urlObj.searchParams.get('courseId');
+          const urlEmail = urlObj.searchParams.get('email');
+          
+          // Get stored token
+          const storedTokenObj = JSON.parse(sessionStorage.getItem("videoToken") || '{}');
+          
+          // Compare token values
+          if (!urlToken || !storedTokenObj.token || urlToken !== storedTokenObj.token) {
+            console.error("Video token mismatch");
+            return false;
+          }
+          
+          // Check if token has expired
+          const now = Math.floor(Date.now() / 1000);
+          if (!urlExpires || parseInt(urlExpires) < now) {
+            console.error("Video token has expired");
+            return false;
+          }
+          
+          // Check other parameters
+          if (urlCourseId !== courseId || urlEmail !== email) {
+            console.error("Course ID or email mismatch in video token");
+            return false;
+          }
+          
+          return true;
+        } catch (error) {
+          console.error("Error validating video token:", error);
+          
+          // For localhost development, return true even on validation errors
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log("Development mode - ignoring token validation error");
+            return true;
+          }
+          
+          return false;
+        }
+      }
 
-      function loadVideo(url, element) {
+      async function loadVideo(url, element) {
+        console.log("Loading video from:", url);
         const videoContainer = document.getElementById("mainVideo");
         currentVideoUrl = url;
         progressChecked = false;
 
-        // Remove active class from all
+        // Remove all active classes
         document
           .querySelectorAll(".module-item")
           .forEach((item) => item.classList.remove("active"));
 
-        // Set active class to current
         if (element) {
           element.closest(".module-item").classList.add("active");
         }
 
-        // Insert video HTML
-        videoContainer.innerHTML = `
-    <video id="courseVideo" controls autoplay controlsList="nodownload" oncontextmenu="return false" width="640" height="360">
-      <source src="${url}" type="video/mp4" />
-      <track src="/captions.vtt" kind="subtitles" srclang="en" label="English" default>
-      Your browser does not support HTML5 video.
-    </video>
-  `;
-
-        // Wait for the DOM to update, then get the video element
-        setTimeout(() => {
-          currentVideoElement = document.getElementById("courseVideo");
-          attachVideoEvents(currentVideoElement, element);
-        }, 0);
+        try {
+          // Properly encode the URL to handle special characters
+          const encodedUrl = url
+            .replace(/ /g, '%20')
+            .replace(/&/g, '%26')
+            .replace(/\?/g, '%3F')
+            .replace(/\+/g, '%2B')
+            .replace(/#/g, '%23');
+            
+          console.log("Encoded URL:", encodedUrl);
+          
+          // Create a simple video element
+          videoContainer.innerHTML = `
+            <div class="video-container">
+              <video 
+                controls 
+                autoplay 
+                controlsList="nodownload"
+                width="100%" 
+                height="auto"
+                style="max-height: 500px;"
+                crossorigin="anonymous"
+              >
+                <source src="${encodedUrl}" type="video/mp4">
+                Your browser does not support HTML5 video.
+              </video>
+            </div>
+          `;
+          
+          const videoElement = videoContainer.querySelector('video');
+          currentVideoElement = videoElement;
+          
+          // Add event listeners if video element exists
+          if (videoElement) {
+            // Track progress for marking modules as watched
+            videoElement.addEventListener("timeupdate", () => {
+              if (!progressChecked && videoElement.currentTime >= 0.9 * videoElement.duration) {
+                const checkbox = element?.closest(".module-item")?.querySelector('input[type="checkbox"]');
+                if (checkbox && !checkbox.checked) {
+                  checkbox.checked = true;
+                  updateProgress(checkbox.id.split("_")[1], true);
+                  progressChecked = true;
+                }
+              }
+            });
+            
+            // Handle auto-play next video
+            videoElement.addEventListener("ended", () => {
+              playNextVideo();
+            });
+            
+            // Handle errors with fallback option
+            videoElement.addEventListener("error", async (e) => {
+              console.error("Video error:", e);
+              console.error("Video error code:", videoElement.error ? videoElement.error.code : 'unknown');
+              
+              try {
+                // Try a backup approach - fetch as blob and use object URL
+                videoContainer.innerHTML = `
+                  <div class="video-loading">
+                    <p>Trying alternative playback method...</p>
+                    <div class="progress-bar">
+                      <div class="progress-value" style="width: 0%"></div>
+                    </div>
+                  </div>
+                `;
+                
+                const progressBar = videoContainer.querySelector('.progress-value');
+                
+                // Fetch the URL directly with no special headers
+                const response = await fetch(encodedUrl);
+                
+                if (!response.ok) {
+                  throw new Error(`Network error: ${response.status}`);
+                }
+                
+                // Get total size for progress tracking
+                const contentLength = response.headers.get('Content-Length');
+                const totalSize = contentLength ? parseInt(contentLength, 10) : 0;
+                let loadedSize = 0;
+                
+                // Stream the response as it comes in
+                const reader = response.body.getReader();
+                const chunks = [];
+                
+                while(true) {
+                  const {done, value} = await reader.read();
+                  if (done) break;
+                  
+                  chunks.push(value);
+                  loadedSize += value.length;
+                  
+                  // Update progress if we know total size
+                  if (totalSize > 0) {
+                    const percent = Math.round((loadedSize / totalSize) * 100);
+                    progressBar.style.width = `${percent}%`;
+                  }
+                }
+                
+                // Combine chunks into a blob
+                const blob = new Blob(chunks, {type: 'video/mp4'});
+                const objectUrl = URL.createObjectURL(blob);
+                
+                // Create a new video element with the blob URL
+                videoContainer.innerHTML = `
+                  <video 
+                    controls 
+                    autoplay 
+                    controlsList="nodownload"
+                    width="100%" 
+                    height="auto"
+                    style="max-height: 500px;"
+                    src="${objectUrl}"
+                  >
+                    Your browser does not support HTML5 video.
+                  </video>
+                `;
+                
+                const newVideo = videoContainer.querySelector('video');
+                currentVideoElement = newVideo;
+                
+                // Add cleanup to revoke object URL when done
+                newVideo.addEventListener('ended', () => {
+                  URL.revokeObjectURL(objectUrl);
+                  playNextVideo();
+                });
+                
+                // Re-add progress tracking
+                newVideo.addEventListener("timeupdate", () => {
+                  if (!progressChecked && newVideo.currentTime >= 0.9 * newVideo.duration) {
+                    const checkbox = element?.closest(".module-item")?.querySelector('input[type="checkbox"]');
+                    if (checkbox && !checkbox.checked) {
+                      checkbox.checked = true;
+                      updateProgress(checkbox.id.split("_")[1], true);
+                      progressChecked = true;
+                    }
+                  }
+                });
+                
+              } catch (fallbackError) {
+                console.error("Fallback method failed:", fallbackError);
+                
+                // If all methods fail, show complete error info
+                videoContainer.innerHTML = `<div style="padding: 20px; background: #f8d7da; color: #721c24; border-radius: 5px;">
+                  <h3>Video Playback Error</h3>
+                  <p>Unable to play this video after multiple attempts.</p>
+                  <p>Error code: ${videoElement.error ? videoElement.error.code : 'unknown'}</p>
+                  <p>URL: ${encodedUrl}</p>
+                  <p>Details: ${fallbackError.message}</p>
+                  <div style="margin-top: 15px; text-align: left; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                    <p><strong>Troubleshooting:</strong></p>
+                    <ul>
+                      <li>Check your internet connection</li>
+                      <li>Try refreshing the page</li>
+                      <li>Try using a different browser</li>
+                      <li>Contact support if the issue persists</li>
+                    </ul>
+                  </div>
+                </div>`;
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Error setting up video:", error);
+          videoContainer.innerHTML = `<div style="padding: 20px; background: #f8d7da; color: #721c24; border-radius: 5px;">
+            <h3>Error Loading Video</h3>
+            <p>${error.message || 'An unexpected error occurred'}</p>
+            <p>Please try refreshing the page or contact support.</p>
+          </div>`;
+        }
+      }
+      
+      // Comprehensive security check function
+      function checkSecurity(url) {
+        // Domain restriction check first
+        if (!checkDomain()) return false;
+        
+        // Check if the session token matches
+        const storedSessionToken = sessionStorage.getItem("sessionToken");
+        if (storedSessionToken !== sessionToken) {
+          console.error("Session token mismatch");
+          document.body.innerHTML = "<h1>Access Denied</h1><p>Videos can only be watched in the original tab they were loaded in.</p>";
+          return false;
+        }
+        
+        // Check if page was loaded within the current browser session
+        const storedPageToken = sessionStorage.getItem("uniquePageToken");
+        if (!storedPageToken || storedPageToken !== uniquePageToken) {
+          console.error("Page token mismatch");
+          document.body.innerHTML = "<h1>Access Denied</h1><p>Please reload the page to continue watching.</p>";
+          return false;
+        }
+        
+        return true;
+      }
+      
+      // Validate video URL to ensure it belongs to this course
+      function validateVideoURL(url) {
+        // In development mode, just return true to allow all URLs
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.log("Development mode - bypassing URL validation");
+          return true;
+        }
+        
+        // For production, check the domain
+        const urlString = url.toString();
+        
+        // Accept CloudFront URLs and allowed domains
+        const isAllowedDomain = 
+          urlString.includes('cloudfront.net') || 
+          allowedDomainsList.some(domain => urlString.includes(domain));
+        
+        if (!isAllowedDomain) {
+          console.error("Video URL not from allowed domain:", urlString);
+          return false;
+        }
+        
+        return true;
       }
 
       function attachVideoEvents(video, buttonElement) {
@@ -269,6 +684,18 @@
 
         if (!video) return;
 
+        // Simplified event handling
+        video.addEventListener('error', (e) => {
+          console.error("Video error event:", e);
+        });
+        
+        // Add domain check on video play - with simpler approach
+        video.addEventListener('play', () => {
+          if (!checkDomain()) {
+            video.pause();
+          }
+        });
+        
         video.addEventListener("timeupdate", () => {
           if (!progressChecked && video.currentTime >= 0.9 * video.duration) {
             if (checkbox && !checkbox.checked) {
@@ -308,6 +735,7 @@
       }
 
       function updateProgress(moduleId, watched) {
+        // Just send the update without any domain checks
         fetch("/update-video-progress", {
           method: "POST",
           headers: {
@@ -320,16 +748,152 @@
           }),
         })
           .then((res) => res.json())
-          .then((data) => console.log(data.message))
-          .catch((err) => console.error("Error:", err));
+          .then((data) => console.log("Progress update:", data.message))
+          .catch((err) => console.error("Error updating progress:", err));
       }
 
       window.onload = function () {
-        const firstVideoBtn = document.querySelector(".module-item button");
-        if (firstVideoBtn) {
-          firstVideoBtn.click();
+        console.log("Page loaded - initializing video player");
+        try {
+          // Load the first video when the page loads
+          const firstVideoBtn = document.querySelector(".module-item button");
+          if (firstVideoBtn) {
+            console.log("Found first video button, loading video");
+            setTimeout(() => {
+              firstVideoBtn.click();
+            }, 100); // Small delay to ensure DOM is fully loaded
+          } else {
+            console.error("No video buttons found");
+            document.getElementById("mainVideo").innerHTML = `
+              <div style="padding: 20px; background: #f8d7da; color: #721c24; border-radius: 5px;">
+                <h3>No Videos Available</h3>
+                <p>No videos were found for this course.</p>
+              </div>
+            `;
+          }
+        } catch (error) {
+          console.error("Error loading initial video:", error);
         }
       };
+
+      // Initialize the accordion
+      document.addEventListener('DOMContentLoaded', function() {
+        // Accordion functionality
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        accordionHeaders.forEach(header => {
+          header.addEventListener('click', function() {
+            const body = this.nextElementSibling;
+            const arrow = this.querySelector('.arrow');
+            
+            // Toggle body visibility
+            body.classList.toggle('show');
+            arrow.classList.toggle('rotate');
+          });
+        });
+        
+        // Open the first section by default
+        if (accordionHeaders.length > 0) {
+          accordionHeaders[0].click();
+        }
+      });
+      
+      // Current active module
+      let activeModule = null;
+      
+      // Function to select a module
+      function selectModule(moduleElement) {
+        // Remove active class from previous module
+        if (activeModule) {
+          activeModule.classList.remove('active');
+        }
+        
+        // Add active class to selected module
+        moduleElement.classList.add('active');
+        activeModule = moduleElement;
+        
+        // Update current module title and description
+        const moduleTitle = moduleElement.getAttribute('data-title');
+        const moduleDescription = moduleElement.getAttribute('data-description');
+        
+        document.getElementById('current-module-title').textContent = moduleTitle;
+        document.getElementById('module-description').textContent = moduleDescription || '';
+      }
+      
+      // Function to play a module video
+      function playModule(event, securityId, moduleId) {
+        // Prevent the click from bubbling up to the module div
+        event.stopPropagation();
+        
+        // Select the module
+        const moduleElement = document.getElementById(`module-${moduleId}`);
+        selectModule(moduleElement);
+        
+        // Create loading overlay if it doesn't exist
+        let loadingOverlay = document.querySelector('.video-loading-overlay');
+        if (!loadingOverlay) {
+          loadingOverlay = document.createElement('div');
+          loadingOverlay.className = 'video-loading-overlay';
+          loadingOverlay.innerHTML = `
+            <div class="spinner"></div>
+            <div>Loading secure video...</div>
+          `;
+          document.getElementById('video-container').appendChild(loadingOverlay);
+        } else {
+          loadingOverlay.style.display = 'flex';
+        }
+        
+        // Get the video element
+        const videoElement = document.getElementById('currentVideo');
+        
+        // Use the secure video loading function
+        window.playSecureVideo(videoElement, securityId, moduleId)
+          .then(() => {
+            // Hide loading overlay when done
+            loadingOverlay.style.display = 'none';
+            
+            // Record watching progress
+            recordProgress(moduleId);
+          })
+          .catch(error => {
+            console.error('Error playing video:', error);
+            // Show error message
+            loadingOverlay.style.display = 'none';
+            
+            let errorOverlay = document.querySelector('.video-error-overlay');
+            if (!errorOverlay) {
+              errorOverlay = document.createElement('div');
+              errorOverlay.className = 'video-error-overlay';
+              errorOverlay.innerHTML = `
+                <div>Error loading video: ${error.message || 'Unknown error'}</div>
+              `;
+              document.getElementById('video-container').appendChild(errorOverlay);
+            } else {
+              errorOverlay.style.display = 'flex';
+              errorOverlay.innerHTML = `
+                <div>Error loading video: ${error.message || 'Unknown error'}</div>
+              `;
+            }
+            
+            // Hide error after 5 seconds
+            setTimeout(() => {
+              errorOverlay.style.display = 'none';
+            }, 5000);
+          });
+      }
+      
+      // Function to record watching progress
+      function recordProgress(moduleId) {
+        fetch('/update-video-progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            module_id: moduleId,
+            watched: true
+          })
+        });
+      }
     </script>
   </body>
 </html>

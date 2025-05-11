@@ -3,17 +3,19 @@
 
 -- 2. Courses Table
 CREATE TABLE courses (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  image_url TEXT,
-  description TEXT,
-  price INT,
-  full_content TEXT,
-  language TEXT,
-  instructor TEXT,
-  duration TEXT,
-  videos_count TEXT
+  
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    image_url TEXT,
+    description TEXT,
+    price INTEGER,
+    full_content TEXT,
+    language TEXT,
+    instructor TEXT,
+    duration TEXT,
+    vedio_duration TEXT
 );
+
 
 -- 3. Sections Table
 CREATE TABLE sections (
@@ -55,12 +57,44 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     reset_token VARCHAR(255),  -- Store the reset token
     reset_token_expiration TIMESTAMP,  -- Store the expiration time for the reset token
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    
 );
 
 CREATE TABLE promo_codes (
   id SERIAL PRIMARY KEY,
   code VARCHAR(255) UNIQUE NOT NULL,
   price_offer NUMERIC(10, 2) NOT NULL
+);
+
+CREATE TABLE certificates (
+  id SERIAL PRIMARY KEY,
+  email TEXT NOT NULL,
+  course_id INT REFERENCES courses(id) ON DELETE CASCADE,
+	certificate_code TEXT UNIQUE NOT NULL;
+	user_id INT
+  issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+
+
+
+CREATE TABLE payment_history (
+  id SERIAL PRIMARY KEY,
+  email TEXT NOT NULL,
+  payment_id TEXT NOT NULL,
+  order_id TEXT NOT NULL,
+  amount NUMERIC(10, 2) NOT NULL,
+  status TEXT NOT NULL,  -- 'success' or 'failure'
+  payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS public.admin (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(250) NOT NULL,
+    reset_token VARCHAR(250),
+    reset_token_expiration BIGINT
 );

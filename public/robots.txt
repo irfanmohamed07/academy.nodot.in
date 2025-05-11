@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /courses
+Allow: /course/
+Allow: /aboutus
+Allow: /signup
+Allow: /login
+
+Disallow: /admin/
+Disallow: /mylearning/
+Disallow: /profile/
+Disallow: /learn/
+Disallow: /purchase-history/
+Disallow: /cart/
+Disallow: /payment/
+
+Sitemap: https://academy.nodot.in/sitemap.xml 

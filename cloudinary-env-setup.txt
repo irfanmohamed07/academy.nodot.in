@@ -1,0 +1,32 @@
+# Cloudinary Environment Variables Setup
+
+Add the following to your .env file:
+
+```
+# Cloudinary Configuration
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+## How to set up Cloudinary:
+
+1. Sign up for a free Cloudinary account at https://cloudinary.com/users/register/free
+
+2. After signing up, you'll be taken to your dashboard where you can find your:
+   - Cloud name
+   - API Key
+   - API Secret
+
+3. Add these values to your .env file
+
+4. Upload your course videos to Cloudinary:
+   - Using the Cloudinary Media Library in the dashboard
+   - Using the upload script provided in cloudinary-setup.js
+
+5. Make sure to maintain your folder structure, e.g., videos/course1/video1
+
+6. In your database, update the video_url column for your modules to use the Cloudinary public ID
+   without extension (e.g., "videos/course1/intro" instead of "intro.mp4")
+
+7. Restart your application to apply the changes 

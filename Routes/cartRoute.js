@@ -6,9 +6,19 @@ import dotenv from "dotenv";
 
 const router = express.Router();
 
+dotenv.config();
+
+// Log the Razorpay credentials to debug
+console.log("Razorpay Key ID from ENV:", process.env.RAZORPAY_KEY_ID);
+console.log("Razorpay Key Secret from ENV:", process.env.RAZORPAY_KEY_SECRET ? "Secret exists" : "Secret missing");
+
+// Use fallback values if environment variables are not set
+const key_id = process.env.RAZORPAY_KEY_ID || "rzp_test_YOUR_TEST_KEY_ID";
+const key_secret = process.env.RAZORPAY_KEY_SECRET || "YOUR_TEST_KEY_SECRET";
+
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID, // Replace with your Razorpay Key ID
-  key_secret: process.env.RAZORPAY_KEY_SECRET, // Replace with your Razorpay Key Secret
+  key_id: key_id,
+  key_secret: key_secret
 });
 
 let cart = [];
@@ -182,6 +192,11 @@ router.post("/process-payment", async (req, res) => {
       // Now that the payment is successful, insert into the database
       const { total } = req.body;
       const email = req.session.email; // Get email from session or request
+
+      await pool.query(
+        "INSERT INTO payment_history (email, payment_id, order_id, amount, status) VALUES ($1, $2, $3, $4, $5)",
+        [email, payment_id, order_id, total, "success"]
+      );
 
       // Insert purchased courses into the database (example)
       for (const course of cart) {

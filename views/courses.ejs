@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <title>Explore All Courses | Nodot Academy</title>
+    <meta name="description" content="Browse our complete catalog of high-quality online courses. Learn in-demand skills, earn certificates, and gain practical experience through internship opportunities." />
+    <meta name="keywords" content="online courses, e-learning, web development, data science, mobile app development, UI/UX design, professional courses, certificate courses, affordable courses" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://academy.nodot.in/courses" />
+    <meta property="og:title" content="Explore All Courses | Nodot Academy" />
+    <meta property="og:description" content="Browse our complete catalog of high-quality online courses with certificates and internship opportunities." />
+    <meta property="og:image" content="/images/logo.jpg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://academy.nodot.in/courses" />
+    <meta property="twitter:title" content="Explore All Courses | Nodot Academy" />
+    <meta property="twitter:description" content="Browse our complete catalog of high-quality online courses with certificates and internship opportunities." />
+    <meta property="twitter:image" content="/images/logo.jpg" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://academy.nodot.in/courses" />
+    
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="css/aboutus.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    
+    <!-- Structured Data for Course List -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": [
+          <% courses.forEach((course, index) => { %>
+          {
+            "@type": "ListItem",
+            "position": <%= index + 1 %>,
+            "item": {
+              "@type": "Course",
+              "name": "<%= course.name %>",
+              "description": "<%= course.description %>",
+              "provider": {
+                "@type": "Organization",
+                "name": "Nodot Academy",
+                "sameAs": "https://academy.nodot.in"
+              },
+              "url": "https://academy.nodot.in/course/<%= course.id %>"
+            }
+          }<%= index < courses.length - 1 ? ',' : '' %>
+          <% }); %>
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <%- include('partials/header') -%>
+    <section class="courses" id="courses">
+      <h1>Explore Our Courses</h1>
+      <p class="subtitle">Discover high-quality courses designed to help you succeed in today's competitive market</p>
+      <div class="course-grid">
+        <% courses.forEach(course => { %>
+        <div class="course-card">
+          <img src="<%= course.image_url %>" alt="<%= course.name %> - Online Course by Nodot Academy" />
+          <h3><%= course.name %></h3>
+          <p><%= course.description %></p>
+          <span>₹<%= course.price %></span>
+          <p>
+            <a href="/course/<%= course.id %>">
+              <button class="cta-button">More Details</button>
+            </a>
+          </p>
+        </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <%- include('partials/footer') -%>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Certificate Verification</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 50px;
+        background: #f9f9f9;
+        text-align: center;
+      }
+
+      .container {
+        background: white;
+        padding: 30px;
+        max-width: 600px;
+        margin: auto;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #2ecc71;
+      }
+
+      .invalid {
+        color: red;
+      }
+
+      p {
+        font-size: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <% if (valid) { %>
+      <h1>✅ Certificate Verified</h1>
+      <p><strong><%= name %></strong> has completed</p>
+      <p><strong><%= course %></strong></p>
+      <p>Issued on <%= date %></p>
+      <p>Certificate Code: <strong><%= code %></strong></p>
+      <% } else { %>
+      <h1 class="invalid">❌ Invalid Certificate</h1>
+      <p>The certificate code you entered is not valid.</p>
+      <% } %>
+    </div>
+  </body>
+</html>

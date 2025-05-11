@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Meta Tags -->
+  <title>Search Results for "<%= searchQuery %>" | Nodot Academy</title>
+  <meta name="description" content="View search results for '<%= searchQuery %>' at Nodot Academy. Browse our courses, learn new skills, and advance your career with our quality online education." />
+  <meta name="robots" content="noindex, follow" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://academy.nodot.in/courses/search?query=<%= encodeURIComponent(searchQuery) %>" />
+  <meta property="og:title" content="Search Results for '<%= searchQuery %>' | Nodot Academy" />
+  <meta property="og:description" content="Browse courses related to '<%= searchQuery %>' at Nodot Academy. Find the perfect course to advance your skills." />
+  <meta property="og:image" content="/images/logo.jpg" />
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://academy.nodot.in/courses/search?query=<%= encodeURIComponent(searchQuery) %>" />
+  <meta property="twitter:title" content="Search Results for '<%= searchQuery %>' | Nodot Academy" />
+  <meta property="twitter:description" content="Browse courses related to '<%= searchQuery %>' at Nodot Academy. Find the perfect course to advance your skills." />
+  <meta property="twitter:image" content="/images/logo.jpg" />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+  <link rel="manifest" href="/favicon/site.webmanifest" />
+  
+  <!-- Canonical URL with preserved search query -->
+  <link rel="canonical" href="https://academy.nodot.in/courses/search?query=<%= encodeURIComponent(searchQuery) %>" />
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/aboutus.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <% if (courses.length > 0) { %>
+  <!-- Structured Data for Search Results -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": [
+        <% courses.forEach((course, index) => { %>
+        {
+          "@type": "ListItem",
+          "position": <%= index + 1 %>,
+          "item": {
+            "@type": "Course",
+            "name": "<%= course.name %>",
+            "description": "<%= course.description %>",
+            "provider": {
+              "@type": "Organization",
+              "name": "Nodot Academy",
+              "sameAs": "https://academy.nodot.in"
+            },
+            "url": "https://academy.nodot.in/course/<%= course.id %>"
+          }
+        }<%= index < courses.length - 1 ? ',' : '' %>
+        <% }); %>
+      ]
+    }
+  </script>
+  <% } %>
+</head>
+<body>
+  <%- include('partials/header', { active: 'courses' }) %>
+
+  <section class="courses">
+    <h1>Search Results for "<%= searchQuery %>"</h1>
+    <p class="subtitle">Found <%= courses.length %> course<%= courses.length !== 1 ? 's' : '' %> matching your search</p>
+
+    <% if (courses.length === 0) { %>
+      <div class="no-results">
+        <i class="bi bi-search" style="font-size: 3rem; color: #6a6f73; margin-bottom: 20px;"></i>
+        <p>No courses found matching "<%= searchQuery %>"</p>
+        <p style="margin-bottom: 30px;">Try different keywords or browse our courses</p>
+        <div class="search-suggestions">
+          <h2>Popular searches:</h2>
+          <div class="suggestion-tags">
+            <a href="/courses/search?query=web+development">Web Development</a>
+            <a href="/courses/search?query=javascript">JavaScript</a>
+            <a href="/courses/search?query=data+science">Data Science</a>
+            <a href="/courses/search?query=mobile+app">Mobile App</a>
+            <a href="/courses/search?query=design">UI/UX Design</a>
+          </div>
+        </div>
+        <a href="/courses" class="cta-button">Browse All Courses</a>
+      </div>
+    <% } else { %>
+      <div class="course-grid">
+        <% courses.forEach(course => { %>
+        <div class="course-card">
+          <img src="<%= course.image_url %>" alt="<%= course.name %> - <%= searchQuery %> course by Nodot Academy" />
+          <h3><%= course.name %></h3>
+          <p><%= course.description %></p>
+          <span>₹<%= course.price %></span>
+          <p>
+            <a href="/course/<%= course.id %>">
+              <button class="cta-button">More Details</button>
+            </a>
+          </p>
+        </div>
+        <% }) %>
+      </div>
+      
+      <!-- Related searches section -->
+      <div class="related-searches">
+        <h2>Related searches:</h2>
+        <div class="suggestion-tags">
+          <a href="/courses/search?query=<%= encodeURIComponent(searchQuery) %>+tutorial"><%=searchQuery%> tutorial</a>
+          <a href="/courses/search?query=<%= encodeURIComponent(searchQuery) %>+beginners"><%=searchQuery%> for beginners</a>
+          <a href="/courses/search?query=<%= encodeURIComponent(searchQuery) %>+advanced">Advanced <%=searchQuery%></a>
+          <a href="/courses/search?query=learn+<%= encodeURIComponent(searchQuery) %>">Learn <%=searchQuery%></a>
+        </div>
+      </div>
+    <% } %>
+  </section>
+
+  <style>
+    .no-results {
+      text-align: center;
+      padding: 60px 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .no-results p {
+      font-size: 1.2rem;
+      color: #1c1d1f;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      color: #6a6f73;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .search-suggestions,
+    .related-searches {
+      margin: 30px 0;
+      text-align: center;
+    }
+    
+    .search-suggestions h2,
+    .related-searches h2 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: #1c1d1f;
+    }
+    
+    .suggestion-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    
+    .suggestion-tags a {
+      background-color: #f7f9fa;
+      border: 1px solid #d1d7dc;
+      padding: 8px 15px;
+      border-radius: 20px;
+      color: #5624d0;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
+    .suggestion-tags a:hover {
+      background-color: #efeff5;
+      border-color: #5624d0;
+    }
+    
+    .related-searches {
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 1px solid #d1d7dc;
+    }
+  </style>
+
+  <%- include('partials/footer') %>
+</body>
+</html> 
