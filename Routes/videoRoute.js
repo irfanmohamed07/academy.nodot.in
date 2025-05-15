@@ -84,7 +84,6 @@ function createSecureVideoUrl(videoPath, req) {
     
     // Return signed URL with domain restriction
     const url = cloudinary.url(cleanPath, options);
-    console.log(`Created secure URL for ${videoPath} with token ${uniqueToken.substring(0, 6)}...`);
     return url;
   } catch (error) {
     console.error('Error creating Cloudinary URL:', error);
@@ -101,7 +100,6 @@ router.get('/api/secure-video/:securityId', async (req, res) => {
   try {
     // Only allow authenticated users to access videos
     if (!req.session.isAuthenticated || !req.session.email) {
-      console.log('Unauthorized access attempt to video API');
       return res.status(401).json({ error: 'Unauthorized' });
     }
     
@@ -126,9 +124,6 @@ router.get('/api/secure-video/:securityId', async (req, res) => {
       return res.status(404).json({ error: 'Module not found' });
     }
     
-    // Log the module's security ID for debugging
-    console.log(`Module ${moduleId} security ID: ${securityId}`);
-    
     const courseId = moduleResult.rows[0].course_id;
     
     // Check if the user has purchased the course
@@ -138,11 +133,6 @@ router.get('/api/secure-video/:securityId', async (req, res) => {
     );
 
     if (purchaseCheck.rows.length === 0) {
-      console.log('Unauthorized attempt to access video for unpurchased course', {
-        email: userEmail,
-        courseId,
-        moduleId
-      });
       return res.status(403).json({ error: 'You have not purchased this course' });
     }
     
@@ -151,9 +141,6 @@ router.get('/api/secure-video/:securityId', async (req, res) => {
     if (!videoUrl) {
       return res.status(404).json({ error: 'Video not available' });
     }
-    
-    // Security check passed, log successful access
-    console.log(`Secure video access granted: Module ${moduleId} for ${userEmail}`);
     
     // Create a secure URL with short expiration
     const secureUrl = createSecureVideoUrl(videoUrl, req);
@@ -199,7 +186,6 @@ export function generateSecureVideoScript(sessionToken) {
   return `
   <script>
     // Secure video loading with blob URLs - prevents videos from being copied to other tabs
-    console.log("Initializing secure video script");
     
     // Store video security mappings and blob URLs
     const videoBlobs = {};
@@ -207,8 +193,6 @@ export function generateSecureVideoScript(sessionToken) {
     
     // Function to securely load a video when needed
     async function secureLoadVideo(securityId, moduleId) {
-      console.log("Loading secure video:", securityId, "for module:", moduleId);
-      
       // If already loading, don't start again
       if (loadingVideos[securityId]) return loadingVideos[securityId];
       
@@ -243,7 +227,6 @@ export function generateSecureVideoScript(sessionToken) {
           
           // Store the blob URL
           videoBlobs[securityId] = blobUrl;
-          console.log("Blob URL created successfully");
           resolve(blobUrl);
           
           // Clean up the loading promise
@@ -260,7 +243,6 @@ export function generateSecureVideoScript(sessionToken) {
     
     // Function to play a secure video
     window.playSecureVideo = async function(videoElement, securityId, moduleId) {
-      console.log("Playing secure video:", moduleId);
       try {
         // Load the video as a blob
         const blobUrl = await secureLoadVideo(securityId, moduleId);
@@ -290,8 +272,6 @@ export function generateSecureVideoScript(sessionToken) {
         URL.revokeObjectURL(videoBlobs[securityId]);
       }
     });
-    
-    console.log("Secure video script initialized. playSecureVideo function:", typeof window.playSecureVideo);
   </script>
   `;
 }

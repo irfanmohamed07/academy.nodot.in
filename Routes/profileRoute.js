@@ -260,7 +260,6 @@ router.get("/learn/:id", async (req, res) => {
       
       // Store the mapping in server memory in case we need to verify
       // This helps for debugging
-      console.log(`Module ${module.id} security ID: ${videoSecurityId.substring(0, 24)}`);
       
       return {
         ...module,
@@ -328,8 +327,6 @@ router.get("/certificate/:id", async (req, res) => {
   const email = req.session.user.email;
   const name = req.session.user.name;
   const userId = req.session.user.id;
-
-  console.log(email, name, userId);
 
   try {
     // Check if certificate already issued
@@ -419,8 +416,6 @@ router.get("/test-video/:type", (req, res) => {
     } else {
       videoUrl = createSecureVideoUrl(videoPath, req);
     }
-    
-    console.log('Generated Cloudinary URL:', videoUrl);
     
     // Render a simple page with the video and protection
     res.send(`
@@ -906,11 +901,6 @@ router.get("/api/secure-video/:securityId", async (req, res) => {
     
     // Use the full security ID when comparing
     if (securityId !== expectedSecurityId) {
-      console.log('Invalid security ID:', {
-        provided: securityId.substring(0, 24) + '...',
-        expected: expectedSecurityId.substring(0, 24) + '...',
-        moduleId
-      });
       return res.status(403).json({ error: "Invalid security ID" });
     }
     
@@ -930,7 +920,6 @@ router.get("/api/secure-video/:securityId", async (req, res) => {
     const secureUrl = createSecureVideoUrl(videoPath, req);
     
     // Record this video access in logs or analytics if needed
-    console.log(`Secure video access granted: Module ${moduleId} for ${req.session.email}`);
     
     // Return the secure URL to the client
     return res.json({
@@ -941,6 +930,56 @@ router.get("/api/secure-video/:securityId", async (req, res) => {
   } catch (error) {
     console.error("Error providing secure video URL:", error);
     return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Add route to verify certificates
+router.get("/verify", async (req, res) => {
+  try {
+    const certificateCode = req.query.code;
+    
+    if (!certificateCode) {
+      return res.render("verify", { 
+        valid: false,
+        user: req.session.user || null
+      });
+    }
+    
+    // Query the certificate from database
+    const certResult = await pool.query(
+      `SELECT c.*, u.name, co.name as course_name 
+       FROM certificates c
+       JOIN users u ON c.user_id = u.id
+       JOIN courses co ON c.course_id = co.id
+       WHERE c.certificate_code = $1`,
+      [certificateCode]
+    );
+    
+    if (certResult.rows.length === 0) {
+      return res.render("verify", { 
+        valid: false,
+        user: req.session.user || null
+      });
+    }
+    
+    const certificate = certResult.rows[0];
+    
+    return res.render("verify", {
+      valid: true,
+      user: req.session.user || null,
+      name: certificate.name,
+      course: certificate.course_name,
+      date: new Date(certificate.issued_at).toLocaleDateString(),
+      code: certificate.certificate_code
+    });
+    
+  } catch (err) {
+    console.error("Certificate verification error:", err);
+    return res.render("verify", { 
+      valid: false,
+      user: req.session.user || null,
+      error: "An error occurred during verification"
+    });
   }
 });
 

@@ -56,11 +56,10 @@ router.post("/login", async (req, res) => {
       email: user.email,
       avatar: user.avatar || "/images/default-avatar.png", // Provide a default avatar if not set
     };
-    console.log(req.session.user);
 
     res.redirect("/");
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.render("login", {
       user: req.session.user || null,
       error: "An error occurred",

@@ -8,9 +8,7 @@ const router = express.Router();
 
 dotenv.config();
 
-// Log the Razorpay credentials to debug
-console.log("Razorpay Key ID from ENV:", process.env.RAZORPAY_KEY_ID);
-console.log("Razorpay Key Secret from ENV:", process.env.RAZORPAY_KEY_SECRET ? "Secret exists" : "Secret missing");
+// Initialize Razorpay configuration
 
 // Use fallback values if environment variables are not set
 const key_id = process.env.RAZORPAY_KEY_ID || "rzp_test_YOUR_TEST_KEY_ID";
@@ -80,15 +78,7 @@ router.post("/promo-code", async (req, res) => {
       [code]
     );
 
-    console.log("Promo Query Result:", promoQuery.rows); // Log the result
-
-    let discount = 0; // Initialize discount variable
-
-    if (promoQuery.rows.length > 0) {
-      // Promo code is valid, get the price offer
-      discount = parseFloat(promoQuery.rows[0].price_offer); // Use price_offer column
-
-      console.log("Promo code discount:", discount); // Log the discount value
+        let discount = 0; // Initialize discount variable    if (promoQuery.rows.length > 0) {      // Promo code is valid, get the price offer      discount = parseFloat(promoQuery.rows[0].price_offer); // Use price_offer column
 
       if (isNaN(discount) || discount <= 0) {
         discount = 0; // Invalid discount value, set to 0

@@ -21,7 +21,6 @@ router.get("/courses", async (req, res) => {
 router.get("/courses/search", async (req, res) => {
   try {
     const searchQuery = req.query.query;
-    console.log("Search query:", searchQuery);
     
     if (!searchQuery) {
       return res.redirect('/courses');
@@ -33,11 +32,7 @@ router.get("/courses/search", async (req, res) => {
       [`%${searchQuery}%`]
     );
     
-    // Log the results for debugging
-    console.log(`Found ${result.rows.length} results`);
-    if (result.rows.length > 0) {
-      console.log("First result:", result.rows[0]);
-    }
+    // Process results
     
     res.render("search-results", {
       courses: result.rows,

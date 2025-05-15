@@ -364,7 +364,7 @@
                     <div class="module-content">
                       <input type="checkbox" id="check_<%= module.id %>" 
                              class="module-checkbox" 
-                             <%= module.watched ? 'checked' : '' %> 
+                             <%= watchedModules.includes(module.id) ? 'checked' : '' %> 
                              onchange="updateProgress(<%= module.id %>, this.checked)" />
                       <button onclick="playModule(event, '<%= module.securityId %>', <%= module.id %>)">
                         <%= module.title %> (<%= module.duration %> min)
@@ -392,7 +392,7 @@
             navigator.serviceWorker.register('/js/videoProtection.js', {
               scope: '/js/'
             }).then(registration => {
-              console.log('Video protection service worker registered:', registration.scope);
+              // Service worker registered
             }).catch(error => {
               console.error('Service worker registration failed:', error);
               // Continue without service worker
@@ -477,7 +477,6 @@
         try {
           // For localhost development, bypass token validation
           if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log("Development mode - bypassing token validation");
             return true;
           }
           
@@ -493,20 +492,17 @@
           
           // Compare token values
           if (!urlToken || !storedTokenObj.token || urlToken !== storedTokenObj.token) {
-            console.error("Video token mismatch");
             return false;
           }
           
           // Check if token has expired
           const now = Math.floor(Date.now() / 1000);
           if (!urlExpires || parseInt(urlExpires) < now) {
-            console.error("Video token has expired");
             return false;
           }
           
           // Check other parameters
           if (urlCourseId !== courseId || urlEmail !== email) {
-            console.error("Course ID or email mismatch in video token");
             return false;
           }
           
@@ -516,7 +512,6 @@
           
           // For localhost development, return true even on validation errors
           if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log("Development mode - ignoring token validation error");
             return true;
           }
           
@@ -525,7 +520,6 @@
       }
 
       async function loadVideo(url, element) {
-        console.log("Loading video from:", url);
         const videoContainer = document.getElementById("mainVideo");
         currentVideoUrl = url;
         progressChecked = false;
@@ -548,8 +542,6 @@
             .replace(/\+/g, '%2B')
             .replace(/#/g, '%23');
             
-          console.log("Encoded URL:", encodedUrl);
-          
           // Create a simple video element
           videoContainer.innerHTML = `
             <div class="video-container">
@@ -575,12 +567,18 @@
           if (videoElement) {
             // Track progress for marking modules as watched
             videoElement.addEventListener("timeupdate", () => {
-              if (!progressChecked && videoElement.currentTime >= 0.9 * videoElement.duration) {
-                const checkbox = element?.closest(".module-item")?.querySelector('input[type="checkbox"]');
-                if (checkbox && !checkbox.checked) {
-                  checkbox.checked = true;
-                  updateProgress(checkbox.id.split("_")[1], true);
-                  progressChecked = true;
+              if (!progressChecked && videoElement.duration > 0) {
+                // Mark as watched when 70% of the video is watched
+                if (videoElement.currentTime >= 0.7 * videoElement.duration) {
+                  const moduleId = element?.closest(".module-item")?.getAttribute('data-module-id');
+                  if (moduleId) {
+                    const checkbox = document.getElementById(`check_${moduleId}`);
+                    if (checkbox && !checkbox.checked) {
+                      checkbox.checked = true;
+                      updateProgress(moduleId, true);
+                      progressChecked = true;
+                    }
+                  }
                 }
               }
             });
@@ -804,8 +802,6 @@
         if (currentIndex >= 0 && currentIndex < moduleButtons.length - 1) {
           const nextButton = moduleButtons[currentIndex + 1];
           nextButton.click();
-        } else {
-          console.log("All videos completed.");
         }
       }
 
@@ -817,7 +813,13 @@
       }
 
       function updateProgress(moduleId, watched) {
-        // Just send the update without any domain checks
+        // Update UI checkbox immediately for better user experience
+        const checkbox = document.getElementById(`check_${moduleId}`);
+        if (checkbox) {
+          checkbox.checked = watched;
+        }
+
+        // Send the update to the server
         fetch("/update-video-progress", {
           method: "POST",
           headers: {
@@ -830,11 +832,30 @@
         })
           .then((res) => res.json())
           .then((data) => {
-            console.log("Progress update:", data.message);
-            
             // Update UI with completion percentage if available
             if (data.completionPercentage !== undefined) {
               updateCompletionDisplay(data.completionPercentage, data.completedModules, data.totalModules);
+
+              // If course is 100% complete, show a message about certificate availability
+              if (data.completionPercentage === 100) {
+                const successMessage = document.createElement('div');
+                successMessage.style.padding = '10px';
+                successMessage.style.margin = '10px 0';
+                successMessage.style.backgroundColor = '#d4edda';
+                successMessage.style.color = '#155724';
+                successMessage.style.borderRadius = '5px';
+                successMessage.style.textAlign = 'center';
+                successMessage.innerHTML = `
+                  <p><strong>Congratulations!</strong> You've completed this course. 
+                  <a href="/certificate/<%= course.id %>" target="_blank">View your certificate</a></p>
+                `;
+                
+                // Check if message already exists
+                if (!document.querySelector('.course-complete-message')) {
+                  successMessage.className = 'course-complete-message';
+                  document.querySelector('.course-progress').appendChild(successMessage);
+                }
+              }
             }
           })
           .catch((err) => console.error("Error updating progress:", err));
@@ -842,9 +863,6 @@
 
       // Function to update completion display in UI
       function updateCompletionDisplay(percentage, completed, total) {
-        // Update progress in the UI
-        console.log(`Course progress: ${percentage}% (${completed}/${total} modules completed)`);
-        
         // Update or create the progress container
         let progressContainer = document.querySelector('.course-progress');
         if (!progressContainer) {
@@ -891,8 +909,6 @@
         })
         .then(res => res.json())
         .then(data => {
-          console.log("Progress update:", data.message);
-          
           // Update UI with completion percentage if available
           if (data.completionPercentage !== undefined) {
             updateCompletionDisplay(data.completionPercentage, data.completedModules, data.totalModules);
@@ -902,7 +918,6 @@
       }
 
       window.onload = function () {
-        console.log("Page loaded - initializing video player");
         try {
           // Initialize course progress
           initializeProgress();
@@ -910,12 +925,10 @@
           // Load the first video when the page loads
           const firstVideoBtn = document.querySelector(".module-item button");
           if (firstVideoBtn) {
-            console.log("Found first video button, loading video");
             setTimeout(() => {
               firstVideoBtn.click();
             }, 100); // Small delay to ensure DOM is fully loaded
           } else {
-            console.error("No video buttons found");
             document.getElementById("mainVideo").innerHTML = `
               <div style="padding: 20px; background: #f8d7da; color: #721c24; border-radius: 5px;">
                 <h3>No Videos Available</h3>
@@ -991,6 +1004,10 @@
         const moduleElement = document.getElementById(`module-${moduleId}`);
         selectModule(moduleElement);
         
+        // Check if this module is already marked as watched
+        const checkbox = document.getElementById(`check_${moduleId}`);
+        progressChecked = checkbox && checkbox.checked;
+        
         // Create loading overlay if it doesn't exist
         let loadingOverlay = document.querySelector('.video-loading-overlay');
         if (!loadingOverlay) {
@@ -1016,10 +1033,9 @@
             
             // Add event listener to track video progress
             videoElement.addEventListener('timeupdate', function() {
-              // If video has played more than 90% of its duration, mark as watched
+              // If video has played more than 70% of its duration, mark as watched
               if (!progressChecked && videoElement.duration > 0 && 
-                  (videoElement.currentTime / videoElement.duration) > 0.9) {
-                console.log("Video reached 90% - marking as completed");
+                  (videoElement.currentTime / videoElement.duration) > 0.7) {
                 progressChecked = true;
                 
                 // Update the checkbox
@@ -1035,8 +1051,6 @@
             
             // Event for video completion
             videoElement.addEventListener('ended', function() {
-              console.log("Video ended - marking as completed");
-              
               // Ensure the checkbox is checked
               const checkbox = document.getElementById(`check_${moduleId}`);
               if (checkbox && !checkbox.checked) {
