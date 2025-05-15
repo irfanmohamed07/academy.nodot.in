@@ -78,7 +78,11 @@ router.post("/promo-code", async (req, res) => {
       [code]
     );
 
-        let discount = 0; // Initialize discount variable    if (promoQuery.rows.length > 0) {      // Promo code is valid, get the price offer      discount = parseFloat(promoQuery.rows[0].price_offer); // Use price_offer column
+    let discount = 0; // Initialize discount variable
+    
+    if (promoQuery.rows.length > 0) {
+      // Promo code is valid, get the price offer
+      discount = parseFloat(promoQuery.rows[0].price_offer); // Use price_offer column
 
       if (isNaN(discount) || discount <= 0) {
         discount = 0; // Invalid discount value, set to 0
